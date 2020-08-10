@@ -245,7 +245,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: 0.3s;
 }
 
-.nav-menu .book-a-table a:hover {
+.nav-menu .book-a-table a:hover, .nav-menu .book-a-table input:hover {
   background: #cda45e;
   color: #fff;
 }

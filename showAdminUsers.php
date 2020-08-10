@@ -12,11 +12,16 @@ $user = new CRUD;
 $result = $user->getUser($loginID);
 
 if ($result['status'] == 'U' || empty($loginID)) {
-  header("location: logout.php");
+  header('Location: logout.php');
   exit;
 }
 
 $rows = $user->getAllAdminUsers();
+
+if (isset($_POST['updatePassw'])) {
+  $_SESSEION['userID'] = $_POST['useID'];
+  header('Location: updatePasswForAdmin.php');
+}
 
 ?>
 <!DOCTYPE html>
@@ -38,14 +43,14 @@ $rows = $user->getAllAdminUsers();
 </head>
 <body>
 
-  <?php include('navbar.php') ?>
+  <?php include('parts/navbar.php') ?>
 
   <main class="my-5">
     <div class="container">
       <h2 class="text-muted h5">Admin Users List</h2>
 
       <table class="table table-hover">
-        <thead class="thead-light">
+        <thead style="background:#cda45e;">
           <tr>
             <th>User ID</th>
             <th>First Name</th>
@@ -54,6 +59,8 @@ $rows = $user->getAllAdminUsers();
             <th>Birthday</th>
             <th>Address</th>
             <th>Email</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
 
@@ -67,6 +74,20 @@ $rows = $user->getAllAdminUsers();
               <td><?= $row['bday']; ?></td>
               <td><?= $row['address']; ?></td>
               <td><?= $row['email']; ?></td>
+              <?php if ($result['status'] == 'S'): ?>
+                <td>
+                  <form action="" method="post">
+                    <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
+                    <input type="submit" name="updatePassw" value="Update" class="btn form-control text-white" style="background:#bc8f8f;">
+                  </form>
+                </td>
+                <td>
+                  <form action="userAction.php" method="post">
+                    <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
+                    <input type="submit" name="deleteAdmin" value="Delete" class="btn form-control text-white" style="background:#d2691e;">
+                  </form>
+                </td>
+              <?php endif ?>
             </tr>
           <?php endforeach ?>
         </tbody>

@@ -1,31 +1,35 @@
 <?php
 
-include('headerForUser.php');
+include('parts/headerForUser.php');
 
+if ($result['status'] == 'S') {
+  $status = 'A';
+} else {
+  $status = 'U';
+}
+        
 ?>
 
 <section id="hero" class="hero" style="padding-top:30px;">
 
   <div class="container" data-aos="fade-up">
-    <div class="section-title text-center py-2">
-      <p>Register</p>
-      <?php if (!empty($messages[0])): ?>
-        <p class="pt-4 text-danger" style="font-size: 20px;">
-          <?php foreach ($messages as $message): ?>
-            <?= $message . "<br>" ?>
+    <?php if (!empty($messages[0])): ?>
+      <p class="pt-4 text-center text-danger mb-0" style="font-size: 20px; padding-top:0 !important;">
+        <?php foreach ($messages as $message): ?>
+          <?= $message . "<br>" ?>
           <?php endforeach ?>
         </p>
       <?php endif ?>
+    <div class="section-title text-center py-2">
+      <p>Register</p>
     </div>
   </div>
-
+ 
   
   <div class="container" data-aos="fade-up" style="padding-top:0;">
-
     <div class="w-50 mx-auto mt-lg-0">
 
       <form action="userAction.php" method="post" class="register mb-5">
-
         <div class="form-row">
           <div class="col-md-6 form-group mx-auto">
             <label for="firstName">First Name</label>
@@ -78,8 +82,13 @@ include('headerForUser.php');
           </div>
         </div>
 
+        <input type="hidden" name="status" value="<?= $status ?>">
 
-        <div class="text-center"><input type="submit" name="register" value="Register"></div>
+        <div id="login" class="text-center nav-menu">
+          <div class="book-a-table">
+            <input type="submit" name="register" value="Register" class="btn">
+          </div>
+        </div>
       </form>
 
     </div>
@@ -88,4 +97,4 @@ include('headerForUser.php');
 
 <?php
 
-include('footer.php');
+include('parts/footer.php');

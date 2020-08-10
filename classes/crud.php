@@ -9,15 +9,16 @@ require_once('database.php');
 class CRUD extends Database {
   
   // register user data to table
-  public function insertToTable($firstName, $lastName, $bday, $address, $email, $username, $password) {
+  public function register($firstName, $lastName, $bday, $address, $email, $username, $password, $status) {
     $sql_check ="SELECT * FROM login WHERE username = '$username' ";
     $res = $this->conn->query($sql_check);
     if ($res->num_rows != 0) {
-      echo "Error: The username already exists. Change your username.";
+      $_SESSION['message'] = 'The username already exists. Change your username.';
+      $_SESSION['color'] = 'text-danger';
     } else {
       $new_pass = md5($password);
 
-      $sql1 = "INSERT INTO login(username, password) VALUES ('$username', '$new_pass')";
+      $sql1 = "INSERT INTO login(username, password, status) VALUES ('$username', '$new_pass', '$status')";
 
       if ($this->conn->query($sql1)) {
         $lastID = $this->conn->insert_id;
@@ -26,13 +27,18 @@ class CRUD extends Database {
 
         if ($this->conn->query($sql2)) {
           $_SESSION['message'] = "Your profile registered successfully.";
+          $_SESSION['color'] = "text-success";
           $_SESSION['login_id'] = $lastID;
           header('Location: login.php');
         } else {
-          echo "Error in inserting your data." . $this->conn->error;
+          $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
+          $_SESSION['color'] = 'text-danger';
+          header('Location: register.php');
         }
       } else {
-        echo "Error in inserting your data." . $this->conn->error;
+        $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
+        $_SESSION['color'] = 'text-danger';
+        header('Location: register.php');
       }
     }
   }
@@ -50,11 +56,9 @@ class CRUD extends Database {
       $_SESSION['login_id'] = $row['login_id'];
 
       if ($row['status'] == 'U') {
-        header('Location: user.php');
-      } elseif ($row['status'] == 'A') {
-        header('Location: dashboard.php');
+        header('Location: updateUser.php');
       } else {
-        header('Location: superAdmin.php');
+        header('Location: dashboard.php');
       }
     } else {
       $_SESSION['color'] = "text-danger";
@@ -72,7 +76,7 @@ class CRUD extends Database {
     }
   }
 
-  // get all users information
+  // get all standard users information 
   public function getAllUsers() {
     $sql = "SELECT * FROM login JOIN user ON login.login_id = user.login_id WHERE login.status = 'U' ";
 
@@ -114,16 +118,84 @@ class CRUD extends Database {
       $_SESSION['color'] = "text-success";
       $_SESSION['message'] = "Your profile updated successfully.";
       if ($status == 'U') {
-        header('Location: user.php');
-      } elseif ($status == 'A') {
-        header('Location: profileAdmin.php');
+        header('Location: updateUser.php');
       } else {
-        header('Location: superAdmin.php');
+        header('Location: updateAdmin.php');
       }
     } else {
       echo "Error in updating. " . $this->conn->error;
     }
   }
+
+  // add item
+  public function addItem($itemName, $itemPrice, $itemQuantity, $roast, $itemDesc, $itemPicture) {
+    $sql = "INSERT INTO items(item_name, item_price, item_quantity, roast_level, item_desc, item_picture) VALUES ('$itemName', '$itemPrice', '$itemQuantity', '$roast', '$itemDesc', '$itemPicture' )";
+
+    if ($this->conn->query($sql)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  // show all items you chose
+  public function getItems($status) {
+    if ($status == 'A') {
+      $sql = "SELECT * FROM items";
+    } else {
+      $sql = "SELECT * FROM items WHERE item_status = '$status' ";
+    }
+
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
+  // get an item information
+  public function getItem($itemID) {
+    $sql = "SELECT * FROM items WHERE item_id = '$itemID' ";
+
+    if ($result = $this->conn->query($sql)) {
+      return $result->fetch_assoc();
+    }
+  }
+
+  // update item information
+  public function updateItem($itemID, $itemName, $itemPrice, $itemQuantity, $roast, $itemDesc, $itemPicture, $itemStatus) {
+    if ($itemPicture == "") {
+      $sql = "UPDATE items 
+      SET
+        item_name = '$itemName', 
+        item_price = '$itemPrice', 
+        item_quantity = '$itemQuantity', 
+        item_desc = '$itemDesc', 
+        roast_level = '$roast', 
+        item_status = '$itemStatus'  
+      WHERE item_id = '$itemID' ";
+    } else {
+    $sql = "UPDATE items 
+      SET
+        item_name = '$itemName', 
+        item_price = '$itemPrice', 
+        item_quantity = '$itemQuantity', 
+        item_desc = '$itemDesc', 
+        roast_level = '$roast', 
+        item_picture = '$itemPicture' , 
+        item_status = '$itemStatus'  
+      WHERE item_id = '$itemID' ";
+    }
+    
+    if ($this->conn->query($sql)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
 
 
 

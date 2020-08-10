@@ -1,6 +1,6 @@
 <?php
 
-include('headerForUser.php');
+include('parts/headerForUser.php');
 
 ?>
 
@@ -35,14 +35,21 @@ include('headerForUser.php');
           <div class="validate"></div>
         </div>
         
-        <div class="text-center"><button type="submit" name="login">Login</button></div>
+        <div id="login"class="text-center nav-menu">
+          <div class="book-a-table">
+            <input type="submit" name="login" value="Login" class="btn">
+          </div>
+        </div>
+
       </form>
 
       <?php if (empty($loginID)): ?>
         <p class="text-center">If you are not a member, please register.</p>
         <nav class="nav-menu d-none d-lg-block">
           <ul>
-            <li class="book-a-table mx-auto" style="padding:0"><a href="register.php">Register</a></li>
+            <li class="book-a-table mx-auto" style="padding:0">
+              <a href="register.php">Register</a>
+          </li>
           </ul>
         </nav>
       <?php endif ?>
@@ -54,4 +61,4 @@ include('headerForUser.php');
 
 <?php
 
-include('footer.php');
+include('parts/footer.php');

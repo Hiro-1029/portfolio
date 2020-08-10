@@ -38,14 +38,14 @@ $rows = $user->getAllUsers();
 </head>
 <body>
 
-  <?php include('navbar.php') ?>
+  <?php include('parts/navbar.php') ?>
 
   <main class="my-5">
     <div class="container">
       <h2 class="text-muted h5">User List</h2>
 
       <table class="table table-hover">
-        <thead class="thead-light">
+        <thead style="background:#cda45e;">
           <tr>
             <th>User ID</th>
             <th>First Name</th>
