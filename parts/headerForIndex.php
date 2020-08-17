@@ -10,6 +10,9 @@ require_once('classes/crud.php');
 $user = new CRUD;
 $result = $user->getUser($loginID);
 
+$rowsForNew = $user->getItems('N');
+$rowsForExist = $user->getItems('E');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -106,8 +109,8 @@ $result = $user->getUser($loginID);
         <ul>
           <li class="active"><a href="index.php">Home</a></li>
           <li><a href="#about">About</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#shopping">Online Shopping</a></li>
+          <li><a href="#menu">Lineup</a></li>
+          <!-- <li><a href="#shopping">Online Shopping</a></li> -->
           <li><a href="#cart">Cart</a></li>
           <li><a href="#contact">Contact</a></li>
 

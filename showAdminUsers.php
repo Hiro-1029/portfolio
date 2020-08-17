@@ -11,7 +11,7 @@ $_SESSION['color'] = "";
 $user = new CRUD;
 $result = $user->getUser($loginID);
 
-if ($result['status'] == 'U' || empty($loginID)) {
+if ($result['status'] != 'S') {
   header('Location: logout.php');
   exit;
 }
@@ -19,8 +19,8 @@ if ($result['status'] == 'U' || empty($loginID)) {
 $rows = $user->getAllAdminUsers();
 
 if (isset($_POST['updatePassw'])) {
-  $_SESSEION['userID'] = $_POST['useID'];
-  header('Location: updatePasswForAdmin.php');
+  $_SESSION['userID'] = $_POST['userID'];
+  header('Location: updateAdmin.php');
 }
 
 ?>
@@ -47,6 +47,7 @@ if (isset($_POST['updatePassw'])) {
 
   <main class="my-5">
     <div class="container">
+
       <h2 class="text-muted h5">Admin Users List</h2>
 
       <table class="table table-hover">

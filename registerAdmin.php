@@ -1,19 +1,57 @@
 <?php
 
-include('parts/header.php');
-        
+require_once('classes/crud.php');
+
+$loginID = $_SESSION['login_id'];
+$_SESSION['message'] = [];
+$_SESSION['color'] = "";
+
+$user = new CRUD;
+$result = $user->getUser($loginID);
+
+if ($result['status'] == 'U' || empty($loginID)) {
+  header('Location: login.php');
+} 
+
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="Description" content="Enter your description here"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://kit.fontawesome.com/cf7a71e984.js" crossorigin="anonymous"></script>
+<title>Register Admin</title>
+<style>
+  body {
+    background-color: white;
+  }
 
-<section id="hero" class="hero" style="padding-top:30px;">
+  @media (max-width: 700px) {
+    .editButton {
+      display: block;
+      margin: 30px 0 auto;
+      text-align: center;
+    }
+}
+</style>
+</head>
+<body>
 
-  <div class="container" data-aos="fade-up">
-    <div class="section-title text-center py-2">
-      <p>Register</p>
+  <?php include('parts/navbar.php') ?>
+
+  <div class="container" data-aos="fade-up">    
+    <div class="section-title text-center py-4">
+      <p>Register Admin</p>
     </div>
   </div>
   
   <div class="container" data-aos="fade-up" style="padding-top:0;">
-    <div class="w-50 mx-auto mt-lg-0">
+    <div class="w-50 mx-auto mt-lg-0 text-dark">
 
       <form action="userAction.php" method="post" class="register mb-5">
         <div class="form-row">
@@ -68,17 +106,18 @@ include('parts/header.php');
           </div>
         </div>
 
-        <div id="login" class="text-center nav-menu">
-          <div class="book-a-table">
-            <input type="submit" name="register" value="Register" class="btn">
-          </div>
-        </div>
+        <input type="hidden" name="status" value="A">
+
+        <input type="submit" name="register" value="Register" class="btn btn-block w-50 mx-auto" style="background:#bc8f8f;">
+       
       </form>
 
     </div>
   </div>
-</section>
 
-<?php
 
-include('parts/footer.php');
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,14 +1,25 @@
 <?php
 
 session_start();
+
 $loginID = $_SESSION['login_id'];
-unset($_SESSION['message']);
-unset($_SESSION['color']);
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
 
 require_once('classes/crud.php');
+require_once('classes/functions.php');
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
+
+$rowsForNew = $user->getItems('N');
+$rowsForExist = $user->getItems('E');
 
 ?>
 <!DOCTYPE html>
@@ -65,6 +76,12 @@ $result = $user->getUser($loginID);
       background: #cda45e;
       color: #fff;
     }
+    #online td {
+      color: white;
+    }
+    #payment tr {
+      height: 40px;
+    }
   </style>
 </head>
 
@@ -104,13 +121,15 @@ $result = $user->getUser($loginID);
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>
-          <li class="active"><a href="index.php">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#shopping">Online Shopping</a></li>
-          <li><a href="#cart">Cart</a></li>
-          <li><a href="#contact">Contact</a></li>
-
+          <li><a href="index.php">Home</a></li>
+          <li><a href="">About</a></li>
+          <li><a href="onlineShopping.php">Online Shopping</a></li>
+          <?php if (!empty($loginID)): ?>
+            <li><a href="cartForMessage.php">Cart</a></li>
+            <!-- <li><a href="cart.php">Cart</a></li> -->
+          <?php endif ?>
+          <li><a href="">Contact</a></li>
+          
           <?php
           if (empty($loginID)) {
             echo "<li class='book-a-table text-center'><a href='login.php'>Login</a></li>";

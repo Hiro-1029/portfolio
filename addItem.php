@@ -3,7 +3,7 @@
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-$messages[] = $_SESSION['message'];
+$message = $_SESSION['message'];
 $color = $_SESSION['color'];
 
 $user = new CRUD;
@@ -39,12 +39,8 @@ if ($result['status'] == 'U' || empty($loginID)) {
   <section class="container text-center text-dark my-3">
 
     <div class="text-center h4">
-      <?php if (!empty($messages[0])): ?>
-        <?= "<p class='pt-3 $color'>" ?>
-          <?php foreach ($messages as $message): ?>
-            <?= $message . "<br>" ?>
-          <?php endforeach ?>
-        </p>
+      <?php if (!empty($message)): ?>
+        <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message<br> </p>" ?>
       <?php endif ?>
     </div>
 

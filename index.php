@@ -1,6 +1,6 @@
 <?php
 
-include('parts/header.php');
+include('parts/headerForIndex.php');
 
 ?>
 
@@ -47,8 +47,9 @@ include('parts/header.php');
               <li><i class="icofont-check-circled"></i> Good quality.</li>
             </ul>
             <p>
-              Let's order.
+              Let's order.<br>
             </p>
+
           </div>
         </div>
 
@@ -61,7 +62,7 @@ include('parts/header.php');
 
         <div class="section-title">
           <h2>Lineup</h2>
-          <p>Check Our Tasty Coffee</p>
+          <p>Check Our Authentic Coffee</p>
         </div>
 
         <div class="row" data-aos="fade-up" data-aos-delay="100">
@@ -71,61 +72,51 @@ include('parts/header.php');
               <li data-filter=".filter-light">Light</li>
               <li data-filter=".filter-medium">Medium</li>
               <li data-filter=".filter-dark">Dark</li>
+              <li data-filter=".filter-other">Other</li>
             </ul>
           </div>
         </div>
 
         <div class="row menu-container" data-aos="fade-up" data-aos-delay="200">
 
-          <div class="col-lg-6 menu-item filter-light">
-            <img src="assets/img/menu/coffee-bean-01.jpg" class="menu-img" alt="">
-            <div class="menu-content">
-              <a href="#">Brazil</a><span>$3.85</span>
+          <!-- show items of new arrival -->
+          <?php foreach ($rowsForNew as $row): ?>
+            <?= "<div class='col-lg-6 menu-item filter-". $row['roast_level'] ."'>" ?>
+              <img src="assets/img/menu/<?= $row['item_picture'] ?>" class="menu-img" alt="">
+              <div class="menu-content">
+                <a href="#"><?= $row['item_name'] ?></a><span><?= $row['item_price'] ?></span>
+              </div>
+              <div class="menu-ingredients">
+                <?= $row['item_desc'] ?>
+              </div>
             </div>
-            <div class="menu-ingredients">
-              Bitter
-            </div>
-          </div>
+          <?php endforeach ?>
 
-          <div class="col-lg-6 menu-item filter-dark">
-            <img src="assets/img/menu/coffee-bean-01.jpg" class="menu-img" alt="">
-            <div class="menu-content">
-              <a href="#">Columbia</a><span>$4.25</span>
+          <!-- show existing items  -->
+          <?php foreach ($rowsForExist as $row): ?>
+            <?= "<div class='col-lg-6 menu-item filter-". $row['roast_level'] ."'>" ?>
+              <img src="assets/img/menu/<?= $row['item_picture'] ?>" class="menu-img" alt="">
+              <div class="menu-content">
+                <a href="#"><?= $row['item_name'] ?></a><span><?= $row['item_price'] ?></span>
+              </div>
+              <div class="menu-ingredients">
+                <?= $row['item_desc'] ?>
+              </div>
             </div>
-            <div class="menu-ingredients">
-              moderate bitter
-            </div>
-          </div>
-
-          <div class="col-lg-6 menu-item filter-light">
-            <img src="assets/img/menu/coffee-bean-01.jpg" class="menu-img" alt="">
-            <div class="menu-content">
-              <a href="#">Myanmar</a><span>$4.00</span>
-            </div>
-            <div class="menu-ingredients">
-              sweet and better
-            </div>
-          </div>
-
-          <div class="col-lg-6 menu-item filter-medium">
-            <img src="assets/img/menu/coffee-bean-01.jpg" class="menu-img" alt="">
-            <div class="menu-content">
-              <a href="#">Indonesia</a><span>$3.95</span>
-            </div>
-            <div class="menu-ingredients">
-              Great smell
-            </div>
-          </div>
-
+          <?php endforeach ?>
 
         </div>
-
+        
+        <!-- button to move to Online Shopping -->
+        <div id="login"class="text-center nav-menu my-3">
+          <a href="onlineShopping.php" class="w-25 mx-auto my-5">Online Shopping</a>
+        </div>
       </div>
-    </section><!-- End Menu Section -->
+    </section>
 
     
     <!-- ======= Testimonials Section ======= -->
-    <section id="testimonials" class="testimonials section-bg">
+    <!-- <section id="testimonials" class="testimonials section-bg">
       <div class="container" data-aos="fade-up">
 
         <div class="section-title">
@@ -193,7 +184,7 @@ include('parts/header.php');
         </div>
 
       </div>
-    </section>
+    </section> -->
 
 
     <!-- ======= Contact Section ======= -->

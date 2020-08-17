@@ -10,14 +10,19 @@
       <li class="nav-item active mr-2">
         <a href="dashboard.php" class="nav-link">Dashboard</a>
       </li>
-      <li class="nav-item active mr-2">
-        <a href="showAdminUsers.php" class="nav-link">Admins</a>
-      </li>
+      <?php if ($result['status'] == 'S'): ?>
+        <li class="nav-item active mr-2">
+          <a href="showAdminUsers.php" class="nav-link">Admins</a>
+        </li>
+      <?php endif ?>
       <li class="nav-item active mr-2">
         <a href="showUsers.php" class="nav-link">Users</a>
       </li>
       <li class="nav-item active mr-2">
-        <a href="items.php" class="nav-link">Items</a>
+        <a href="showItems.php" class="nav-link">Items</a>
+      </li>
+      <li class="nav-item active mr-2">
+        <a href="showTrans.php" class="nav-link">Transactions</a>
       </li>
     </ul>
 

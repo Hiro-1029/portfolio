@@ -3,7 +3,7 @@
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-$messages[] = $_SESSION['message'];
+$message = $_SESSION['message'];
 $color = $_SESSION['color'];
 $itemID = $_SESSION['item_id'];
 
@@ -45,16 +45,12 @@ if ($result['status'] == 'U' || empty($loginID)) {
     </div>
 
     <div class="pb-3">
-      <?php if (empty($messages[0])): ?>
+      <?php if (empty($message)): ?>
         <p class="h4 pt-3 text-dark">
           If you'd like to update item information, <br>please change item datas and press the button below.
         </p>
       <?php else: ?>
-        <?= "<p class='h4 pt-3 $color'>" ?>
-          <?php foreach ($messages as $message): ?>
-            <?= $message . "<br>" ?>
-          <?php endforeach ?>
-        </p>
+        <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message<br> </p>" ?>
       <?php endif ?>
     </div>
 

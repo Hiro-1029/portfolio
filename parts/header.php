@@ -1,15 +1,27 @@
 <?php
 
 session_start();
+
 $loginID = $_SESSION['login_id'];
-unset($_SESSION['message']);
-// $messages = array();
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
+// unset($_SESSION['message']);
+// unset($_SESSION['color']);
 
 require_once('classes/crud.php');
+require_once('classes/functions.php');
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
 
+$rowsForNew = $user->getItems('N');
+$rowsForExist = $user->getItems('E');
 
 ?>
 <!DOCTYPE html>
@@ -43,14 +55,33 @@ $result = $user->getUser($loginID);
   <link href="assets/css/style.css" rel="stylesheet">
 
   <style>
-
+    #login {
+      display: block;
+      position: relative;
+      color: white;
+      transition: 0.3s;
+      font-size: 14px;
+      font-family: "Open Sans", sans-serif;
+    }
+    #login input, #login a {
+      border: 2px solid #cda45e;
+      color: #fff;
+      border-radius: 50px;
+      padding: 8px 25px;
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      transition: 0.3s;
+    }
+    #login input:hover, #login a:hover {
+      background: #cda45e;
+      color: #fff;
+    }
+    #online td {
+      color: white;
+    }
   </style>
-  <!-- =======================================================
-  * Template Name: Restaurantly - v1.1.0
-  * Template URL: https://bootstrapmade.com/restaurantly-restaurant-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
 </head>
 
 <body>
@@ -66,7 +97,7 @@ $result = $user->getUser($loginID);
       <p class="h5 text-warning m-2">
         <?php if (!empty($loginID)): ?>
           <?php if ($result['status'] == 'U'): ?>
-            <a href="user.php">
+            <a href="userProfile.php">
               Welcome: <?= $result['username'] ?>
             </a>
           <?php else: ?>
@@ -84,27 +115,29 @@ $result = $user->getUser($loginID);
     <div class="container d-flex align-items-center">
 
       <h1 class="logo mr-auto"><a href="index.php">Kure Coffee</a></h1>
+      <!-- Uncomment below if you prefer to use an image logo -->
       <a href="index.php" class="logo mr-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>
-          <li class="active"><a href="index.php">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#shopping">Online Shopping</a></li>
-          <li><a href="#cart">Cart</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="index.php">Home</a></li>
+          <li><a href="">About</a></li>
+          <li><a href="onlineShopping.php">Online Shopping</a></li>
+          <?php if (!empty($loginID)): ?>
+            <li><a href="cartForMessage.php">Cart</a></li>
+            <!-- <li><a href="cart.php">Cart</a></li> -->
+          <?php endif ?>
+          <li><a href="">Contact</a></li>
 
           <?php
-          if (!empty($loginID)) {
-            echo "<li class='book-a-table text-center'><a href='logout.php'>Logout</a></li>";
-          } else {
+          if (empty($loginID)) {
             echo "<li class='book-a-table text-center'><a href='login.php'>Login</a></li>";
+          } else {
+            echo "<li class='book-a-table text-center'><a href='logout.php'>Logout</a></li>";
           }
           ?>
 
         </ul>
-      </nav><!-- .nav-menu -->
-
+      </nav>
     </div>
-  </header><!-- End Header -->
+  </header>

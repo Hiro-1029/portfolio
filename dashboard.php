@@ -3,11 +3,14 @@
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
+
 $_SESSION['message'] = [];
 $_SESSION['color'] = "";
+$_SESSION['expire'] = "";
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
+$resultForTrans = $user->getTrans('I');
 
 if ($result['status'] == 'U' || empty($loginID)) {
   header('Location: login.php');
@@ -59,7 +62,7 @@ if ($result['status'] == 'U' || empty($loginID)) {
           Add New Item
         </a>
         <?php if ($result['status'] == 'S'): ?>
-          <a href="register.php" class="editButton text-white rounded py-2 px-5 mx-2 text-decoration-none" style="background:#bc8f8f;">
+          <a href="registerAdmin.php" class="editButton text-white rounded py-2 px-5 mx-2 text-decoration-none" style="background:#bc8f8f;">
             Add New Admin
           </a>
           <!-- <a href="" class="editButton text-white rounded py-2 px-5 mx-2 text-decoration-none" style="background:#d2691e;">
@@ -69,35 +72,30 @@ if ($result['status'] == 'U' || empty($loginID)) {
       </div>
     </div>
 
-    <!-- display posts part -->
+    <!-- show transactions in process -->
     <div class="container-fluid row justify-content-center m-0">
       <div class="col d-flex align-items-center text-dark" style="height:3rem;">
-        <i class="fas fa-edit" ></i> Today's order
+        <i class="fas fa-edit" ></i> Orders in process
       </div>
 
       <table class="table table-striped table-hover">
         <thead class="thead-dark">
           <tr>
-            <th></th>
+            <th>Transaction ID</th>
+            <th>Login ID</th>
+            <th>Total Payment</th>
+            <th>Transaction Date</th>
           </tr>
         </thead>
 
-        <!-- $result = getPostsForAdmin(); -->
-        <!-- while ($row = $result->fetch_assoc()) -->
+        <?php foreach ($resultForTrans as $row): ?>
           <tr>
-            <td class="align-middle"></td>
-            <td class="align-middle"></td>
-            <td class="align-middle"></td>
-            <td class="align-middle"></td>
-            <td class="align-middle"></td>
-            <td>
-              <form action="" method="post">
-                <input type="hidden" name="post_id" value="">
-                <input type="hidden" name="category_id" value="">
-                <button type="submit" name="detail" class="btn btn-outline-dark">&raquo Details</button>
-              </form>
-            </td>
+            <td class="align-middle"><?= $row['tran_id'] ?></td>
+            <td class="align-middle"><?= $row['login_id'] ?></td>
+            <td class="align-middle">USD <?= $row['total_pay'] ?></td>
+            <td class="align-middle"><?= $row['tran_date'] ?></td>
           </tr>
+        <?php endforeach ?>
       </table>
     </div>
   </main>

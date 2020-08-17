@@ -19,7 +19,11 @@ if (isset($_POST['register'])) { // register
     $myObj->register($firstName, $lastName, $bday, $address, $email, $username, $password, $status);
   } else {
     $_SESSION['message'] = "Your password and confirmation password don't match.";
-    header('Location: register.php');
+    if ($status == 'A') {
+      header('Location: registerAdmin.php');
+    } else {
+      header('Location: registerForMessage.php');
+    }
   }
 
 } elseif (isset($_POST['login'])) { // login
@@ -31,14 +35,12 @@ if (isset($_POST['register'])) { // register
 } elseif (isset($_POST['updateUser'])) { // update user profile
   $firstName = $_POST['firstName'];
   $lastName = $_POST['lastName'];
-  $bday = $_POST['bday'];
   $address = $_POST['address'];
   $email = $_POST['email'];
-  $username = $_POST['username'];
   $loginID = $_POST['loginID'];
   $status = $_POST['status'];
 
-  $myObj->updateUser($firstName, $lastName, $bday, $address, $email, $username, $loginID, $status);
+  $myObj->updateUser($firstName, $lastName, $address, $email, $loginID, $status);
  
 } elseif (isset($_POST['addItem'])) { // add item information
   $itemName = $_POST['itemName'];
@@ -95,19 +97,110 @@ if (isset($_POST['register'])) { // register
     header('Location: updateItem.php');
   }
 
-} elseif (isset($_POST['updatePasswForUser'])) {
-  // $userID = $_POST['userID'];
+} elseif (isset($_POST['updatePassw'])) { // update password for user
+  $loginID = $_POST['loginID'];
+  $currentPassw = $_POST['currentPassw'];
+  $newPassw = $_POST['newPassw'];
+  $confPassw = $_POST['confPassw'];
 
+  $result = $myObj->getCurrentPassw($loginID);
 
-  // $myObj->updatePassw();
+  if (password_verify($currentPassw, $result['password'])) {
+    if ($newPassw == $confPassw) {
+      $myObj->updatePassw($loginID, $newPassw);
+    } else {
+      $_SESSION['message'] = "New Password and Confirmation Password do not match.";
+      $_SESSION['color'] = 'text-danger';
+      header('Location: updatePasswForMessage.php');
+    }
+  } else {
+    $_SESSION['message'] = "Your current password was incorrect.";
+    $_SESSION['color'] = 'text-danger';
+    header('Location: updatePasswForMessage.php');
+  }
 
-} elseif (isset($_POST['updatePasswForAdmin'])) {
+} elseif (isset($_POST['updateAdminPassw'])) { // update Admin password by Super Admin
   $userID = $_POST['userID'];
+  $currentPassw = $_POST['currentPassw'];
+  $newPassw = $_POST['newPassw'];
+  $confPassw = $_POST['confPassw'];
+  $loginID = $userID;
 
+  $result = $myObj->getCurrentPassw($loginID);
 
-  $myObj->updatePassw();
+  if (password_verify($currentPassw, $result['password'])) {
+    if ($newPassw == $confPassw) {
+      $myObj->updatePassw($loginID, $newPassw);
+    } else {
+      $_SESSION['message'] = "New Password and Confirmation Password do not match.";
+      $_SESSION['color'] = 'text-danger';
+      header('Location: updateAdminPasswForMessage.php');
+    }
+  } else {
+    $_SESSION['message'] = "The admin current password was incorrect.";
+    $_SESSION['color'] = 'text-danger';
+    header('Location: updateAdminPasswForMessage.php');
+  }
 
-} elseif (isset($_POST['deleteAdmin'])) {
-  $userID = $_POST['userID'];
+} elseif (isset($_POST['putItem'])) { // put item into cart
+  $loginID = $_POST['loginID'];
+  $itemID = $_POST['itemID'];
+
+  if (empty($loginID)) {
+    $_SESSION['start'] = time();
+    $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+    $_SESSION['message'] = "If you would like to purchase items online, please login.";
+    $_SESSION['color'] = "text-warning";
+    header('Location: loginForMessage.php');
+  } else {
+    $myObj->insertItem($loginID, $itemID);
+  }
+
+} elseif(isset($_POST['deleteItem'])) { // delete item from cart
+  $calcID = $_POST['calcID'];
+
+  $myObj->deleteItemFromCart($calcID);
+
+} elseif (isset($_POST['updateCalc'])) { // update items' quantity and grind 
+  $calcID = $_POST['calcID'];
+  $calcQuan = $_POST['calcQuan'];
+  $grind = $_POST['grind'];
+
+  $myObj->updateItemFromCart($calcID, $calcQuan, $grind);
+
+} elseif (isset($_POST['order'])) { // order items
+  $loginID = $_POST['loginID'];
+  $totalPay = $_POST['totalPay'];
+  $date = $_POST['tranDate'];
+  $calcIDs = $_POST['calcIDs'];
+
+  $ansForCheck = $myObj->checkQuan($calcIDs); 
+    // check whether stock is enough or not
+
+  if ($ansForCheck == count($calcIDs)) {
+    $ansForOrder = $myObj->order($loginID, $totalPay, $date);
+      // insert information into 'transactions' table
+    if ($ansForOrder[0] == 1) {
+      $tranID = $ansForOrder[1];
+      $myObj->updateStatusForCalc($calcIDs, $tranID);  
+        // update calc_status from 'I' to 'O' , 'I': In progress, 'O': ordered 
+    }
+
+  } else {
+    $_SESSION['message'] = 
+      "The stock of ". $row['item_name'] ." isn't enough. <br>
+      Only ". $row['item_quantity'] ."00g left.<br> 
+      Sorry for the inconvenience.";
+    $_SESSION['color'] = 'text-danger';
+      // when user cannot order because items are out of stock
+    header('Location: cart.php');
+  }
+
+} elseif (isset($_POST['shipped'])) { // complete shipment
+  $tranID = $_POST['tranID'];
+  $staffID = $_POST['loginID'];
+  $date = $_POST['shippedDate'];
+
+  $myObj->compShipment($tranID, $staffID, $date);
 
 }
