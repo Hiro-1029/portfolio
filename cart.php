@@ -16,17 +16,16 @@ $totalPrice = 0;
         <div class="section-title pb-2">
           <p class="text-center">Your Cart</p>
         </div>
-
         
         <section class='my-3 py-0 text-dark rounded' style="font-family: 'Playfair Display', serif;background:white;">
-          <!-- show error message -->
+          <!-- show message -->
           <?php if (!empty($message)): ?>
             <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message</p>" ?>
           <?php endif ?>
 
           <!-- show items in cart -->
           <?php if (empty($rowsToShowCartItems[0])): ?>
-            <div class="text-center" style="min-height: 300px; font-family:sans-serif;">
+            <div class="text-center" style="font-family:sans-serif;">
               <p class='h5 m-2 p-2'>You cart is empty.</p>
               <p class='h5 m-2 p-2'>Please put some items at Online Shopping Page.</p>
               <div id="login" class="text-center nav-menu my-3">
@@ -137,7 +136,6 @@ $totalPrice = 0;
               <form action="userAction.php" method="post">
                 <input type='hidden' name='loginID' value='<?= $loginID ?>'>
                 <input type='hidden' name='totalPay' value='<?= round($totalPay, 2) ?>'>
-                <input type='hidden' name='tranDate' value='<?= date("Y-m-d H:i:s") ?>'>
                 <?php foreach ($rowsToShowCartItems as $row): ?>
                   <input type="hidden" name="calcIDs[]" value="<?= $row['calc_id'] ?>">
                 <?php endforeach ?>
@@ -147,17 +145,12 @@ $totalPrice = 0;
               </form>
 
             </div>
-
           <?php endif ?>
-
 
         </section>
 
-        
       </div>
     </section>
-
-    
 
   </main>
 

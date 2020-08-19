@@ -5,7 +5,11 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item active mr-2">
-        <a href="index.php" class="nav-link">Home</a>
+        <?php if (empty($loginID)): ?>
+          <a href="index.php" class="nav-link">Home</a>
+        <?php else: ?>
+          <a href="indexForUser.php" class="nav-link">Home</a>
+        <?php endif ?>
       </li>
       <li class="nav-item active mr-2">
         <a href="dashboard.php" class="nav-link">Dashboard</a>

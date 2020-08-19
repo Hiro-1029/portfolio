@@ -1,12 +1,16 @@
 <?php
 
-session_start();
-
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-$_SESSION['message'] = [];
-$_SESSION['color'] = "";
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
@@ -20,7 +24,7 @@ if (isset($_POST['detail'])) { // show transaction detail
   $resultForTran = $user->getTran($tranID);
 }
 
-if ($result['status'] == 'U' || empty($loginID)) {
+if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
   header("location: logout.php");
   exit;
 }
@@ -36,7 +40,7 @@ if ($result['status'] == 'U' || empty($loginID)) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
 <link rel="stylesheet" href="assets/css/style.css">
-<title>Users</title>
+<title>Transaction Detail</title>
 <style>
   body {
     background-color: white;
@@ -48,6 +52,7 @@ if ($result['status'] == 'U' || empty($loginID)) {
   <?php include('parts/navbar.php') ?>
 
   <main class="my-5">
+
     <!-- show transaction detail -->
     <div class="container">
       <h2 class="text-muted h5">Items in process</h2>
@@ -111,7 +116,6 @@ if ($result['status'] == 'U' || empty($loginID)) {
         <form action="userAction.php" method="post">
           <input type="hidden" name="tranID" value="<?= $tranID ?>">
           <input type="hidden" name="loginID" value="<?= $loginID ?>">
-          <input type="hidden" name="shippedDate" value="<?= date("Y-m-d H:i:s") ?>">
           <input type="submit" name="shipped" value="This order shipped." class="btn form-control text-white mt-5 mb-3 btn-block ml-auto" style="background:#bc8f8f; width: 200px;">
         </form>
       <?php endif ?>

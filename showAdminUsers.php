@@ -5,23 +5,25 @@ session_start();
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-$_SESSION['message'] = [];
-$_SESSION['color'] = "";
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
 
-if ($result['status'] != 'S') {
+if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
   header('Location: logout.php');
   exit;
 }
 
-$rows = $user->getAllAdminUsers();
-
-if (isset($_POST['updatePassw'])) {
-  $_SESSION['userID'] = $_POST['userID'];
-  header('Location: updateAdmin.php');
-}
+$rowsForValid = $user->getSelectedAdminUsers('A');
+$rowsForDeleted = $user->getSelectedAdminUsers('R');
 
 ?>
 <!DOCTYPE html>
@@ -48,51 +50,92 @@ if (isset($_POST['updatePassw'])) {
   <main class="my-5">
     <div class="container">
 
-      <h2 class="text-muted h5">Admin Users List</h2>
+      <!-- show message -->
+      <?php if (!empty($message)): ?>
+        <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message</p>" ?>
+      <?php endif ?>
 
-      <table class="table table-hover">
-        <thead style="background:#cda45e;">
-          <tr>
-            <th>User ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-            <th>Birthday</th>
-            <th>Address</th>
-            <th>Email</th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <?php foreach ($rows as $row): ?>
+      <!-- valid Admin users -->
+      <div class="container">
+        <h2 class="text-muted h5">Valid Admin Users List</h2>
+  
+        <table class="table table-hover">
+          <thead style="background:#cda45e;">
             <tr>
-              <td><?= $row['user_id']; ?></td>
-              <td><?= $row['first_name']; ?></td>
-              <td><?= $row['last_name']; ?></td>
-              <td><?= $row['username']; ?></td>
-              <td><?= $row['bday']; ?></td>
-              <td><?= $row['address']; ?></td>
-              <td><?= $row['email']; ?></td>
-              <?php if ($result['status'] == 'S'): ?>
-                <td>
-                  <form action="" method="post">
-                    <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
-                    <input type="submit" name="updatePassw" value="Update" class="btn form-control text-white" style="background:#bc8f8f;">
-                  </form>
-                </td>
+              <th>User ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Username</th>
+              <th>Start Date</th>
+              <th>Address</th>
+              <th>Email</th>
+              <th></th>
+            </tr>
+          </thead>
+  
+          <tbody>
+            <?php foreach ($rowsForValid as $row): ?>
+              <tr>
+                <td><?= $row['user_id']; ?></td>
+                <td><?= $row['first_name']; ?></td>
+                <td><?= $row['last_name']; ?></td>
+                <td><?= $row['username']; ?></td>
+                <td><?= $row['bday']; ?></td>
+                <td><?= $row['address']; ?></td>
+                <td><?= $row['email']; ?></td>
                 <td>
                   <form action="userAction.php" method="post">
                     <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
                     <input type="submit" name="deleteAdmin" value="Delete" class="btn form-control text-white" style="background:#d2691e;">
                   </form>
                 </td>
-              <?php endif ?>
+              </tr>
+            <?php endforeach ?>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Deleted Admin users -->
+      <div class="container">
+        <h2 class="text-muted h5">Deleted Admin Users List</h2>
+  
+        <table class="table table-hover">
+          <thead style="background:#cda45e;">
+            <tr>
+              <th>User ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Username</th>
+              <th>Start Date</th>
+              <th>Address</th>
+              <th>Email</th>
+              <th></th>
             </tr>
-          <?php endforeach ?>
-        </tbody>
-      </table>
+          </thead>
+  
+          <tbody>
+            <?php foreach ($rowsForDeleted as $row): ?>
+              <tr>
+                <td><?= $row['user_id']; ?></td>
+                <td><?= $row['first_name']; ?></td>
+                <td><?= $row['last_name']; ?></td>
+                <td><?= $row['username']; ?></td>
+                <td><?= $row['bday']; ?></td>
+                <td><?= $row['address']; ?></td>
+                <td><?= $row['email']; ?></td>
+                <td>
+                  <form action="userAction.php" method="post">
+                    <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
+                    <input type="submit" name="restoreAdmin" value="Restore" class="btn form-control text-white" style="background:#d2691e;">
+                  </form>
+                </td>
+              </tr>
+            <?php endforeach ?>
+          </tbody>
+        </table>
+      </div>
+
+
     </div>
 
   </main>

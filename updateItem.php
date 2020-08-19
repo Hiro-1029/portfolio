@@ -3,16 +3,21 @@
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-$message = $_SESSION['message'];
-$color = $_SESSION['color'];
-$itemID = $_SESSION['item_id'];
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
 $resultForItem = $user->getItem($itemID);
 
-if ($result['status'] == 'U' || empty($loginID)) {
-  header('Location: login.php');
+if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
+  header('Location: logout.php');
 }
 
 ?>

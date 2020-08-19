@@ -5,8 +5,12 @@ include('parts/header.php');
 ?>
 
 <section id="hero" class="hero" style="padding-top:30px;">
-
   <div class="container" data-aos="fade-up">
+
+    <?php if (!empty($message)): ?>
+      <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message<br> </p>" ?>
+    <?php endif ?>
+
     <div class="section-title text-center py-2">
       <p>Register</p>
     </div>

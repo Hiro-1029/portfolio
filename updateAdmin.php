@@ -3,16 +3,19 @@
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-$message = $_SESSION['message'];
-$color = $_SESSION['color'];
-$userID = $_SESSION['userID'];
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
-$resultByUserID = $user->getUserByUserID($userID);
 
-
-if ($result['status'] != 'S') {
+if ($result['status'] != 'A') {
   header('Location: logout.php');
   exit;
 }
@@ -43,7 +46,7 @@ if ($result['status'] != 'S') {
   <section class="container text-center text-dark my-3">
 
     <div class="section-title">
-      <p>Admin <span class="text-info"><?= $resultByUserID['username'] ?></span>'s Profile</p>
+      <p>Admin <span class="text-info"><?= $result['username'] ?></span>'s Profile</p>
     </div>
 
     <div class="w-50 mx-auto my-2 mt-lg-0 text-dark">
@@ -53,46 +56,46 @@ if ($result['status'] != 'S') {
           <tr>
             <td>Username</td>
             <td class="text-left">
-              <p class="my-1"><?= $resultByUserID['username'] ?></p>
+              <p class="my-1"><?= $result['username'] ?></p>
             </td>
           </tr>
           <tr>
             <td>First Name</td>
             <td>
-              <input type="text" name="firstName" value="<?= $resultByUserID['first_name'] ?>" class="form-control w-100">
+              <input type="text" name="firstName" value="<?= $result['first_name'] ?>" class="form-control w-100">
             </td>
           </tr>
           <tr>
             <td>Last Name</td>
             <td>
-              <input type="text" name="lastName" value="<?= $resultByUserID['last_name'] ?>" class="form-control w-100">
+              <input type="text" name="lastName" value="<?= $result['last_name'] ?>" class="form-control w-100">
             </td>
           </tr>
           <tr>
-            <td>Birthday</td>
+            <td>Start Date</td>
             <td class="text-left">
-              <p class="my-1"><?= $resultByUserID['bday'] ?></p>
+              <p class="my-1"><?= $result['bday'] ?></p>
             </td>
           </tr>
           <tr>
             <td>Address</td>
             <td>
-              <input type="text" name="address" value="<?= $resultByUserID['address'] ?>" class="form-control w-100">
+              <input type="text" name="address" value="<?= $result['address'] ?>" class="form-control w-100">
             </td>
           </tr>
           <tr>
           <tr>
             <td>Email</td>
             <td>
-              <input type="email" name="email" value="<?= $resultByUserID['email'] ?>" class="form-control w-100">
+              <input type="email" name="email" value="<?= $result['email'] ?>" class="form-control w-100">
             </td>
           </tr>
           <tr>
             <td>
-              <input type="hidden" name="loginID" value="<?= $resultByUserID['login_id'] ?>">
+              <input type="hidden" name="loginID" value="<?= $result['login_id'] ?>">
             </td>
             <td>
-              <input type="hidden" name="status" value="<?= $resultByUserID['status'] ?>">
+              <input type="hidden" name="status" value="<?= $result['status'] ?>">
             </td>
           </tr>
           <tr>

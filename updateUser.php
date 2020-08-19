@@ -2,8 +2,8 @@
 
 include('parts/header.php');
 
-if ($result['status'] == 'A' || $result['status'] == 'S' || empty($loginID)) {
-  header('Location: login.php');
+if ($result['status'] == 'A' || $result['status'] == 'S' || $result['status'] == 'R' || empty($loginID)) {
+  header('Location: logout.php');
 } 
 
 ?>

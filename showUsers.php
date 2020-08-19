@@ -1,17 +1,21 @@
 <?php
 
-session_start();
-
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-$_SESSION['message'] = [];
-$_SESSION['color'] = "";
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
 
-if ($result['status'] == 'U' || empty($loginID)) {
+if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
   header("location: logout.php");
   exit;
 }

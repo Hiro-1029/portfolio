@@ -17,12 +17,14 @@ class CRUD extends Database {
     $newPassw = password_hash($password, PASSWORD_DEFAULT);
 
     if ($res1->num_rows != 0) {// the case which there is same username in database
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
       $_SESSION['message'] = 'The username already exists. Change your username.';
       $_SESSION['color'] = 'text-danger';
       if ($status == 'A') {
         header('Location: registerAdmin.php');
       } else {
-        header('Location: registerForMessage.php');
+        header('Location: register.php');
       }
     } else {
       if ($res2->num_rows == 0) {// for initial register
@@ -33,18 +35,24 @@ class CRUD extends Database {
           $sql2 = "INSERT INTO user(first_name, last_name, bday, address, email, picture, login_id) VALUES ('$firstName', '$lastName', '$bday', '$address', '$email', 'avatar.jpg', '$lastID')";
 
           if ($this->conn->query($sql2)) {
+            $_SESSION['start'] = time();
+            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
             $_SESSION['message'] = "Your profile registered as Super Admin.";
             $_SESSION['color'] = "text-success";
-            header('Location: loginForMessage.php');
+            header('Location: login.php');
           } else {
+            $_SESSION['start'] = time();
+            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
             $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
             $_SESSION['color'] = 'text-danger';
-            header('Location: registerForMessage.php');
+            header('Location: register.php');
           }
         } else {
+          $_SESSION['start'] = time();
+          $_SESSION['expire'] = $_SESSION['start'] + 0.1;
           $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
           $_SESSION['color'] = 'text-danger';
-          header('Location: registerForMessage.php');
+          header('Location: register.php');
         }
       } else {// for second register onward
         if ($status == 'A') {
@@ -59,25 +67,31 @@ class CRUD extends Database {
           $sql2 = "INSERT INTO user(first_name, last_name, bday, address, email, picture, login_id) VALUES ('$firstName', '$lastName', '$bday', '$address', '$email', 'avatar.jpg', '$lastID')";
   
           if ($this->conn->query($sql2)) {
+            $_SESSION['start'] = time();
+            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
             $_SESSION['message'] = "Your profile registered successfully.";
             $_SESSION['color'] = "text-success";
-            header('Location: loginForMessage.php');
+            header('Location: login.php');
           } else {
+            $_SESSION['start'] = time();
+            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
             $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
             $_SESSION['color'] = 'text-danger';
             if ($status == 'A') {
               header('Location: registerAdmin.php');
             } else {
-              header('Location: registerForMessage.php');
+              header('Location: register.php');
             }
           }
         } else {
+          $_SESSION['start'] = time();
+          $_SESSION['expire'] = $_SESSION['start'] + 0.1;
           $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
           $_SESSION['color'] = 'text-danger';
           if ($status == 'A') {
             header('Location: registerAdmin.php');
           } else {
-            header('Location: registerForMessage.php');
+            header('Location: register.php');
           }
         }
       }
@@ -91,24 +105,31 @@ class CRUD extends Database {
 
     if ($result->num_rows == 1) {
       $row = $result->fetch_assoc();
+
       if(password_verify($password, $row['password'])) {
         $_SESSION['userame'] = $row['username'];
         $_SESSION['login_id'] = $row['login_id'];
         
         if ($row['status'] == 'S' || $row['status'] == 'A') {
           header('Location: dashboard.php');
+        } elseif ($row['status'] == 'R') {
+          header('Location: logout.php');
         } else {
           header('Location: userProfile.php');
         }
       } else {
+        $_SESSION['start'] = time();
+        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
         $_SESSION['color'] = "text-danger";
         $_SESSION['message'] = "Error found. Check your username and password.";
-        header('Location: loginForMessage.php');
+        header('Location: login.php');
       }
     } else {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
       $_SESSION['color'] = "text-danger";
       $_SESSION['message'] = "Your username wasn't found.";
-      header('Location: loginForMessage.php');
+      header('Location: login.php');
     }
   }
 
@@ -122,13 +143,13 @@ class CRUD extends Database {
   }
 
   /// get user information to update admin password
-  public function getUserByUserID($userID) {
-    $sql = "SELECT * FROM login JOIN user ON login.login_id = user.login_id WHERE user.user_id = '$userID' ";
+  // public function getUserByUserID($userID) {
+  //   $sql = "SELECT * FROM login JOIN user ON login.login_id = user.login_id WHERE user.user_id = '$userID' ";
 
-    if ($result = $this->conn->query($sql)) {
-      return $result->fetch_assoc();
-    }
-  }
+  //   if ($result = $this->conn->query($sql)) {
+  //     return $result->fetch_assoc();
+  //   }
+  // }
 
   // get all standard users information 
   public function getAllUsers() {
@@ -144,8 +165,21 @@ class CRUD extends Database {
   }
 
   // get all adminUsers information
-  public function getAllAdminUsers() {
-    $sql = "SELECT * FROM login JOIN user ON login.login_id = user.login_id WHERE login.status = 'A' ";
+  // public function getAllAdminUsers() {
+  //   $sql = "SELECT * FROM login JOIN user ON login.login_id = user.login_id WHERE login.status = 'A' ";
+
+  //   $result = $this->conn->query($sql);
+  //   $rows = [];
+
+  //   while ($row = $result->fetch_assoc()) {
+  //     $rows[] = $row;
+  //   }
+  //   return $rows;
+  // }
+
+  // get selected adminusers information
+  public function getSelectedAdminUsers($status) {
+    $sql = "SELECT * FROM login JOIN user ON login.login_id = user.login_id WHERE login.status = '$status' ";
 
     $result = $this->conn->query($sql);
     $rows = [];
@@ -167,6 +201,8 @@ class CRUD extends Database {
       WHERE login.login_id = '$loginID' ";
     
     if ($this->conn->query($sql)) {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
       $_SESSION['color'] = "text-success";
       $_SESSION['message'] = "Your profile updated successfully.";
       if ($status == 'A') {
@@ -175,6 +211,8 @@ class CRUD extends Database {
         header('Location: userProfile.php');
       }
     } else {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
       $_SESSION['message'] = 'Uploading error found.';
       $_SESSION['color'] = 'text-danger';
       if ($status == 'A') {
@@ -200,6 +238,8 @@ class CRUD extends Database {
   public function getItems($status) {
     if ($status == 'A') {
       $sql = "SELECT * FROM items";
+    } elseif ($status == 'S') {
+      $sql = "SELECT * FROM items WHERE item_status LIKE 'S%' ";
     } else {
       $sql = "SELECT * FROM items WHERE item_status = '$status' ";
     }
@@ -268,14 +308,70 @@ class CRUD extends Database {
     $newPasswHashed = password_hash($newPassw, PASSWORD_DEFAULT);
     $sql = "UPDATE login SET password = '$newPasswHashed' WHERE login_id = '$loginID' ";
 
+    $sqlCheck = "SELECT * FROM login JOIN user ON login.login_id = user.login_id WHERE login.login_id = '$loginID' ";
+
+    if ($result = $this->conn->query($sqlCheck)) {
+      $row = $result->fetch_assoc();
+    }
+
     if ($this->conn->query($sql)) {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
       $_SESSION['message'] = "Your Password changed. <br> Please don't forget to make a note.";
       $_SESSION['color'] = 'text-success';
-      header('Location: updateAdminPasswForMessage.php');
+      if ($row['status'] == 'A') {
+        header('Location: updateAdminPassw.php');
+      } else {
+        header('Location: userProfile.php');
+      }
     } else {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
       $_SESSION['message'] = "Your Password hasn't changed.";
       $_SESSION['color'] = 'text-danger';
-      header('Location: updateAdminPasswForMessage.php');
+      if ($row['status'] == 'A') {
+        header('Location: updateAdminPassw.php');
+      } else {
+        header('Location: userProfile.php');
+      }
+    }
+  }
+
+  // delete Admin temporarily
+  public function deleteAdmin($userID) {
+    $sql = "UPDATE login SET status = 'R' WHERE login_id = '$userID' ";
+      // 'R' -> 'Remove Temporarily'
+    if ($this->conn->query($sql)) {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      $_SESSION['message'] = "The selected admin user was removed.";
+      $_SESSION['color'] = 'text-success';
+      header('Location: showAdminUsers.php');
+    } else {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      $_SESSION['message'] = "The selected admin user wasn't removed.";
+      $_SESSION['color'] = 'text-danger';
+      header('Location: showAdminUsers.php');
+    }
+  }
+
+  // restore Admin temporarily
+  public function restoreAdmin($userID) {
+    $sql = "UPDATE login SET status = 'A' WHERE login_id = '$userID' ";
+      // 'R' -> 'Remove Temporarily'
+    if ($this->conn->query($sql)) {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      $_SESSION['message'] = "The selected admin user was restored.";
+      $_SESSION['color'] = 'text-success';
+      header('Location: showAdminUsers.php');
+    } else {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      $_SESSION['message'] = "The selected admin user wasn't restored.";
+      $_SESSION['color'] = 'text-danger';
+      header('Location: showAdminUsers.php');
     }
   }
 
@@ -405,8 +501,8 @@ class CRUD extends Database {
   }
 
   // order item
-  public function order($loginID, $totalPay, $date) {
-    $sql= "INSERT INTO transactions (login_id, total_pay, tran_date, tran_status) VALUES ('$loginID', '$totalPay', '$date', 'I')"; // 'I' means 'In Process'
+  public function order($loginID, $totalPay) {
+    $sql= "INSERT INTO transactions (login_id, total_pay, tran_date, tran_status) VALUES ('$loginID', '$totalPay', now(), 'I')"; // 'I' means 'In Process'
 
     if ($this->conn->query($sql)) {
       $result = $this->conn->insert_id;
@@ -434,13 +530,23 @@ class CRUD extends Database {
       }
 
       if ($newQuan == 0) {
-        $sqlUpdate = "UPDATE calc JOIN items ON calc.item_id = items.item_id 
+        if ($row['item_status'] == 'N') {
+          $sqlUpdate = "UPDATE calc JOIN items ON calc.item_id = items.item_id 
           SET 
             calc.calc_status = 'O', 
             items.item_quantity = '$newQuan', 
             calc.tran_id = '$tranID', 
-            items.item_status = 'S'
+            items.item_status = 'SN'
           WHERE calc.calc_id = '$id' ";
+        } elseif ($row['item_status'] == 'E') {
+          $sqlUpdate = "UPDATE calc JOIN items ON calc.item_id = items.item_id 
+            SET 
+              calc.calc_status = 'O', 
+              items.item_quantity = '$newQuan', 
+              calc.tran_id = '$tranID', 
+              items.item_status = 'SE'
+            WHERE calc.calc_id = '$id' ";
+        }
       } else {
         $sqlUpdate = "UPDATE calc JOIN items ON calc.item_id = items.item_id 
           SET 
@@ -471,7 +577,15 @@ class CRUD extends Database {
 
   // show transactions not to have been sent yet
   public function getTrans($tranStatus) {
-    $sql = "SELECT * FROM transactions WHERE tran_status = '$tranStatus' ";
+    // if ($tranStatus == 'S') { 
+      if ($tranStatus == 'S' || $tranStatus == 'SN' || $tranStatus == 'SE') { 
+        // 'SN' -> 'Sold out after New', 'SE' -> 'Sold our after Existing'
+        // preg_match('/S/', $tranStatus);
+      $sql = "SELECT * FROM transactions WHERE tran_status = '$tranStatus' ORDER BY tran_id DESC";
+    } else {
+      $sql = "SELECT * FROM transactions WHERE tran_status = '$tranStatus' ";
+    }
+
     $result = $this->conn->query($sql);
     $rows = [];
 
@@ -498,17 +612,17 @@ class CRUD extends Database {
   }
 
   // complete shipment
-  // <!-- transactions: tran_status -> S(hipped), shipped_date, staff_id -->
-  //     <!-- calc: calc_status O->C(omplete) -->
-  public function compShipment($tranID, $staffID, $date) {
+  public function compShipment($tranID, $staffID) {
     $sqlForTran = "UPDATE transactions 
       SET 
         tran_status = 'S', 
         staff_id = '$staffID', 
-        shipped_date = '$date' 
+        shipped_date = now() 
        WHERE tran_id = '$tranID' ";
-    
+        
     $sqlForCalc = "UPDATE calc SET calc_status = 'C' WHERE tran_id = '$tranID' ";
+      // transactions: tran_status -> S(hipped), shipped_date, staff_id
+      // calc: calc_status O->C(omplete)
 
     if ($this->conn->query($sqlForTran)) {
       if ($this->conn->query($sqlForCalc)) {
@@ -531,10 +645,92 @@ class CRUD extends Database {
       $_SESSION['color'] = "text-danger";
       header('Location: showTrans.php');
     }
-
   }
 
-  
+  // show user transaction history
+  public function getTransForHistory($loginID) {
+    $sql = "SELECT * FROM transactions WHERE login_id = '$loginID' ORDER BY tran_id DESC";
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
+  // cancel order which wasn't shipped yet
+  public function cancel($tranID) {
+    $sqlForTran = "UPDATE transactions SET tran_status = 'R' WHERE tran_id = '$tranID' ";
+      // 'R' -> 'Removed'
+
+    $sqlCheck = "SELECT * FROM calc JOIN items ON calc.item_id = items.item_id WHERE tran_id = '$tranID' ";
+    $result = $this->conn->query($sqlCheck);
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    
+    $count = 0;
+    $countRows = count($rows);
+    
+    if ($this->conn->query($sqlForTran)) {
+      if ($this->conn->query($sqlCheck)) {
+        foreach ($rows as $row) {
+          $itemID = $row['item_id'];
+          $itemQuan = $row['calc_quan'] + $row['item_quantity'];
+    
+          if ($row['item_status'] == 'SN') {
+            $sqlForCal = "UPDATE calc JOIN items ON calc.item_id = items.item_id 
+              SET
+                calc.calc_status = 'R', 
+                items.item_quantity = '$itemQuan',
+                items.item_status = 'N'
+              WHERE calc.item_id = '$itemID' ";
+          } elseif ($row['item_status'] == 'SE') {
+            $sqlForCal = "UPDATE calc JOIN items ON calc.item_id = items.item_id 
+              SET
+                calc.calc_status = 'R', 
+                items.item_quantity = '$itemQuan',
+                items.item_status = 'E'
+              WHERE calc.item_id = '$itemID' ";
+          } else {
+            $sqlForCal = "UPDATE calc JOIN items ON calc.item_id = items.item_id 
+              SET
+                calc.calc_status = 'R', 
+                items.item_quantity = '$itemQuan'
+              WHERE calc.item_id = '$itemID' ";
+          }
+    
+          if ($this->conn->query($sqlForCal)) {
+            $count++;
+            if ($count == $countRows) {
+              $_SESSION['start'] = time();
+              $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+              $_SESSION['message'] = "This order was canceled.";
+              $_SESSION['color'] = "text-success";
+              header('Location: history.php');
+            }
+          } 
+        } // foreach ends here
+
+      } else {
+        $_SESSION['start'] = time();
+        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        $_SESSION['message'] = "This order wan't canceled. <br> Please email us.";
+        $_SESSION['color'] = "text-danger";
+        header('Location: history.php');
+      }
+    } else {
+      $_SESSION['start'] = time();
+      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      $_SESSION['message'] = "This order wan't canceled. <br> Please email us.";
+      $_SESSION['color'] = "text-danger";
+      header('Location: history.php');
+    }
+  }
+
+
   
 
 }

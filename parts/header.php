@@ -11,17 +11,12 @@ if ($now > $_SESSION['expire']) {
   $message = $_SESSION['message'];
   $color = $_SESSION['color'];
 }
-// unset($_SESSION['message']);
-// unset($_SESSION['color']);
 
 require_once('classes/crud.php');
 require_once('classes/functions.php');
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
-
-$rowsForNew = $user->getItems('N');
-$rowsForExist = $user->getItems('E');
 
 ?>
 <!DOCTYPE html>
@@ -32,6 +27,7 @@ $rowsForExist = $user->getItems('E');
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>Kure Coffee</title>
+  <!-- <link rel="icon" href="img/about.png"> -->
   <meta content="" name="descriptison">
   <meta content="" name="keywords">
 
@@ -41,6 +37,7 @@ $rowsForExist = $user->getItems('E');
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -81,6 +78,9 @@ $rowsForExist = $user->getItems('E');
     #online td {
       color: white;
     }
+    .card p {
+      margin-bottom: 0;
+    }
   </style>
 </head>
 
@@ -113,21 +113,29 @@ $rowsForExist = $user->getItems('E');
   <!-- ======= Header ======= -->
   <header id="header" class="fixed-top">
     <div class="container d-flex align-items-center">
-
-      <h1 class="logo mr-auto"><a href="index.php">Kure Coffee</a></h1>
-      <!-- Uncomment below if you prefer to use an image logo -->
-      <a href="index.php" class="logo mr-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>
+      <?php if (empty($loginID)): ?>
+        <h1 class="logo mr-auto"><a href="index.php">Kure Coffee</a></h1>
+      <?php else: ?>
+        <h1 class="logo mr-auto"><a href="indexForUser.php">Kure Coffee</a></h1>
+      <?php endif ?>
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>
-          <li><a href="index.php">Home</a></li>
-          <li><a href="">About</a></li>
+          <li>
+            <?php if (empty($loginID)): ?>
+              <a href="index.php">Home</a>
+            <?php else: ?>
+              <a href="indexForUser.php">Home</a>
+            <?php endif ?>
+          </li>
+          <!-- <li><a href="">About</a></li> -->
           <li><a href="onlineShopping.php">Online Shopping</a></li>
           <?php if (!empty($loginID)): ?>
-            <li><a href="cartForMessage.php">Cart</a></li>
+            <li><a href="cart.php">Your Cart</a></li>
+            <li><a href="history.php">Your Order</a></li>
             <!-- <li><a href="cart.php">Cart</a></li> -->
           <?php endif ?>
-          <li><a href="">Contact</a></li>
+          <!-- <li><a href="">Contact</a></li> -->
 
           <?php
           if (empty($loginID)) {

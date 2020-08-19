@@ -12,8 +12,8 @@ $user = new CRUD;
 $result = $user->getUser($loginID);
 $resultForTrans = $user->getTrans('I');
 
-if ($result['status'] == 'U' || empty($loginID)) {
-  header('Location: login.php');
+if ($result['status'] == 'U' || $result['status'] == 'R' || empty($loginID)) {
+  header('Location: logout.php');
 } 
 
 ?>
@@ -65,9 +65,6 @@ if ($result['status'] == 'U' || empty($loginID)) {
           <a href="registerAdmin.php" class="editButton text-white rounded py-2 px-5 mx-2 text-decoration-none" style="background:#bc8f8f;">
             Add New Admin
           </a>
-          <!-- <a href="" class="editButton text-white rounded py-2 px-5 mx-2 text-decoration-none" style="background:#d2691e;">
-            Update Admin
-          </a> -->
         <?php endif ?>
       </div>
     </div>

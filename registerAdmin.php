@@ -9,8 +9,8 @@ $_SESSION['color'] = "";
 $user = new CRUD;
 $result = $user->getUser($loginID);
 
-if ($result['status'] == 'U' || empty($loginID)) {
-  header('Location: login.php');
+if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
+  header('Location: logout.php');
 } 
 
 ?>
@@ -74,7 +74,7 @@ if ($result['status'] == 'U' || empty($loginID)) {
             <div class="validate"></div>
           </div>
           <div class="col-md-6 form-group mx-auto">
-            <label for="bday">Birthday</label>
+            <label for="bday">Start Date</label>
             <input type="date" name="bday" class="form-control" id="bday" required>
             <div class="validate"></div>
           </div>

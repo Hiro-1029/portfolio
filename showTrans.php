@@ -19,7 +19,7 @@ $result = $user->getUser($loginID);
 $resultForTrans = $user->getTrans('I');
 $resultForCompTrans = $user->getTrans('S');
 
-if ($result['status'] == 'U' || empty($loginID)) {
+if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
   header("location: logout.php");
   exit;
 }
@@ -101,16 +101,23 @@ if ($result['status'] == 'U' || empty($loginID)) {
             <th>Login ID</th>
             <th>Total Payment</th>
             <th>Transaction Date</th>
+            <th>Staff Name</th>
+            <th>Shipped Date</th>
             <th></th>
           </tr>
         </thead>
 
         <?php foreach ($resultForCompTrans as $row): ?>
+          <?php 
+            $resultForStaffUsername = $user->getUser($row['staff_id']);
+          ?>
           <tr>
             <td class="align-middle"><?= $row['tran_id'] ?></td>
             <td class="align-middle"><?= $row['login_id'] ?></td>
             <td class="align-middle">USD <?= $row['total_pay'] ?></td>
             <td class="align-middle"><?= $row['tran_date'] ?></td>
+            <td class="align-middle"><?= $resultForStaffUsername['username'] ?></td>
+            <td class="align-middle"><?= $row['shipped_date'] ?></td>
             <td>
               <form action="showTranDetail.php" method="post">
                 <input type="hidden" name="tranID" value="<?= $row['tran_id'] ?>">

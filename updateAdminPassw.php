@@ -3,16 +3,19 @@
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
-unset($_SESSION['message']);
-unset($_SESSION['color']);
-$userID = $_SESSION['userID'];
+$now = time();
+if ($now > $_SESSION['expire']) {
+  unset($_SESSION['message']);
+  unset($_SESSION['color']);
+} else {
+  $message = $_SESSION['message'];
+  $color = $_SESSION['color'];
+}
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
-$resultByUserID = $user->getUserByUserID($userID);
 
-
-if ($result['status'] != 'S') {
+if ($result['status'] != 'A') {
   header('Location: logout.php');
   exit;
 }
@@ -71,7 +74,7 @@ if ($result['status'] != 'S') {
           <div class="validate"></div>
         </div>
         
-        <input type="hidden" name="userID" value="<?= $userID ?>">
+        <input type="hidden" name="userID" value="<?= $loginID ?>">
 
         <?php if (empty($message)): ?>
           <p class="h5 text-center text-danger mb-3">If you really want to change your password, <br> change the button below.</p>
