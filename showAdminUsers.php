@@ -47,95 +47,92 @@ $rowsForDeleted = $user->getSelectedAdminUsers('R');
 
   <?php include('parts/navbar.php') ?>
 
-  <main class="my-5">
+  <main class="my-5" style="margin-top:75px !important;">
+
+    <?php if (!empty($message)): ?>
+      <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message</p>" ?>
+    <?php endif ?>
+
+    <!-- valid Admin users -->
     <div class="container">
+      <h2 class="text-muted h3">Valid Admin Users List</h2>
 
-      <!-- show message -->
-      <?php if (!empty($message)): ?>
-        <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message</p>" ?>
-      <?php endif ?>
+      <table class="table table-hover">
+        <thead style="background:#bc8f8f;">
+          <tr>
+            <th>User ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Start Date</th>
+            <th>Postal Code</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th></th>
+          </tr>
+        </thead>
 
-      <!-- valid Admin users -->
-      <div class="container">
-        <h2 class="text-muted h5">Valid Admin Users List</h2>
-  
-        <table class="table table-hover">
-          <thead style="background:#cda45e;">
+        <tbody>
+          <?php foreach ($rowsForValid as $row): ?>
             <tr>
-              <th>User ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Username</th>
-              <th>Start Date</th>
-              <th>Address</th>
-              <th>Email</th>
-              <th></th>
+              <td><?= $row['user_id']; ?></td>
+              <td><?= $row['first_name']; ?></td>
+              <td><?= $row['last_name']; ?></td>
+              <td><?= $row['username']; ?></td>
+              <td><?= $row['bday']; ?></td>
+              <td><?= substr($row['postal'], 0, 3) . "-" . substr($row['postal'], 3); ?></td>
+              <td><?= $row['address']; ?></td>
+              <td><?= $row['email']; ?></td>
+              <td>
+                <form action="userAction.php" method="post">
+                  <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
+                  <input type="submit" name="deleteAdmin" value="Delete" class="btn form-control text-white" style="background:#bc8f8f;">
+                </form>
+              </td>
             </tr>
-          </thead>
-  
-          <tbody>
-            <?php foreach ($rowsForValid as $row): ?>
-              <tr>
-                <td><?= $row['user_id']; ?></td>
-                <td><?= $row['first_name']; ?></td>
-                <td><?= $row['last_name']; ?></td>
-                <td><?= $row['username']; ?></td>
-                <td><?= $row['bday']; ?></td>
-                <td><?= $row['address']; ?></td>
-                <td><?= $row['email']; ?></td>
-                <td>
-                  <form action="userAction.php" method="post">
-                    <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
-                    <input type="submit" name="deleteAdmin" value="Delete" class="btn form-control text-white" style="background:#d2691e;">
-                  </form>
-                </td>
-              </tr>
-            <?php endforeach ?>
-          </tbody>
-        </table>
-      </div>
+          <?php endforeach ?>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Deleted Admin users -->
-      <div class="container">
-        <h2 class="text-muted h5">Deleted Admin Users List</h2>
-  
-        <table class="table table-hover">
-          <thead style="background:#cda45e;">
+    <!-- Deleted Admin users -->
+    <div class="container mt-5">
+      <h2 class="text-muted h3">Deleted Admin Users List</h2>
+
+      <table class="table table-hover">
+        <thead style="background:#bc8f8f;">
+          <tr>
+            <th>User ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Start Date</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <?php foreach ($rowsForDeleted as $row): ?>
             <tr>
-              <th>User ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Username</th>
-              <th>Start Date</th>
-              <th>Address</th>
-              <th>Email</th>
-              <th></th>
+              <td><?= $row['user_id']; ?></td>
+              <td><?= $row['first_name']; ?></td>
+              <td><?= $row['last_name']; ?></td>
+              <td><?= $row['username']; ?></td>
+              <td><?= $row['bday']; ?></td>
+              <td><?= $row['address']; ?></td>
+              <td><?= $row['email']; ?></td>
+              <td>
+                <form action="userAction.php" method="post">
+                  <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
+                  <input type="submit" name="restoreAdmin" value="Restore" class="btn form-control text-white" style="background:#bc8f8f;">
+                </form>
+              </td>
             </tr>
-          </thead>
-  
-          <tbody>
-            <?php foreach ($rowsForDeleted as $row): ?>
-              <tr>
-                <td><?= $row['user_id']; ?></td>
-                <td><?= $row['first_name']; ?></td>
-                <td><?= $row['last_name']; ?></td>
-                <td><?= $row['username']; ?></td>
-                <td><?= $row['bday']; ?></td>
-                <td><?= $row['address']; ?></td>
-                <td><?= $row['email']; ?></td>
-                <td>
-                  <form action="userAction.php" method="post">
-                    <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
-                    <input type="submit" name="restoreAdmin" value="Restore" class="btn form-control text-white" style="background:#d2691e;">
-                  </form>
-                </td>
-              </tr>
-            <?php endforeach ?>
-          </tbody>
-        </table>
-      </div>
-
-
+          <?php endforeach ?>
+        </tbody>
+      </table>
     </div>
 
   </main>

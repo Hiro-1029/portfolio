@@ -12,7 +12,7 @@ if ($result['status'] == 'A' || $result['status'] == 'S' || $result['status'] ==
 <section id="hero" class="hero" style="padding-top:30px;">
 
   <div class="container" data-aos="fade-up">
-    <div class="section-title text-center">
+    <div class="section-title text-center pb-1">
       <p>Your Profile</p>
     </div>
 
@@ -42,6 +42,12 @@ if ($result['status'] == 'A' || $result['status'] == 'S' || $result['status'] ==
             <td>Birthday</td>
             <td class="text-left">
               <p class="my-1"><?= $result['bday'] ?></p>
+            </td>
+          </tr>
+          <tr>
+            <td>Postal Code</td>
+            <td>
+              <input type="text" name="postal" value="<?= $result['postal'] ?>" class="form-control w-100">
             </td>
           </tr>
           <tr>

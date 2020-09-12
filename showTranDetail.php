@@ -51,14 +51,14 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
 
   <?php include('parts/navbar.php') ?>
 
-  <main class="my-5">
+  <main class="my-5" style="margin-top:75px !important;">
 
     <!-- show transaction detail -->
     <div class="container">
-      <h2 class="text-muted h5">Items in process</h2>
+      <h2 class="text-muted h3">Items in process</h2>
 
       <table class="table table-hover">
-        <thead style="background:#cda45e;">
+        <thead class="text-dark" style="background:#a0522d;">
           <tr>
             <th>Item ID</th>
             <th>Item Name</th>
@@ -84,16 +84,17 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
 
   <!-- show customer information -->
     <div class="container">
-      <h2 class="text-muted h5">Customer Information</h2>
+      <h2 class="text-muted h3">Customer Information</h2>
 
       <table class="table table-hover">
-        <thead style="background:#cda45e;">
+        <thead class="text-dark" style="background:#a0522d;">
           <tr>
             <th>User ID</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Username</th>
             <th>Birthday</th>
+            <th>Postal Code</th>
             <th>Address</th>
             <th>Email</th>
           </tr>
@@ -106,6 +107,7 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
             <td><?= $resultForCustomer['last_name']; ?></td>
             <td><?= $resultForCustomer['username']; ?></td>
             <td><?= $resultForCustomer['bday']; ?></td>
+            <td><?= substr($resultForCustomer['postal'], 0, 3) . "-" . substr($resultForCustomer['postal'], 3); ?></td>
             <td><?= $resultForCustomer['address']; ?></td>
             <td><?= $resultForCustomer['email']; ?></td>
           </tr>
@@ -116,7 +118,7 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
         <form action="userAction.php" method="post">
           <input type="hidden" name="tranID" value="<?= $tranID ?>">
           <input type="hidden" name="loginID" value="<?= $loginID ?>">
-          <input type="submit" name="shipped" value="This order shipped." class="btn form-control text-white mt-5 mb-3 btn-block ml-auto" style="background:#bc8f8f; width: 200px;">
+          <input type="submit" name="shipped" value="This order shipped." class="btn form-control text-white mt-5 mb-3 btn-block ml-auto" style="background:#a0522d; width: 200px;">
         </form>
       <?php endif ?>
 

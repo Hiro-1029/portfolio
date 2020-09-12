@@ -6,19 +6,18 @@
 
           <div class="col-lg-3 col-md-6">
             <div class="footer-info">
-              <h3>Restaurantly</h3>
+              <h3>Kure Coffee</h3>
               <p>
-                A108 Adam Street <br>
-                NY 535022, USA<br><br>
-                <strong>Phone:</strong> +1 5589 55488 55<br>
-                <strong>Email:</strong> info@example.com<br>
+                1-1, Chuo, Aoba-ku Sendai-shi, Miyagi, 980-0021, Miyagi<br><br>
+                <strong>Phone:</strong> +81 90 2345 6789<br>
+                <strong>Email:</strong> cebuit1029@gmail.com<br>
               </p>
               <div class="social-links mt-3">
-                <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
-                <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-                <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-                <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-                <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+                <!-- <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a> -->
+                <a href="https://www.facebook.com/hiroyuki.sakohata.1/" class="facebook"><i class="bx bxl-facebook"></i></a>
+                <a href="https://www.instagram.com/hiroyukisakohata/?hl=ja" class="instagram"><i class="bx bxl-instagram"></i></a>
+                <!-- <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a> -->
+                <a href="https://www.linkedin.com/in/hiroyuki-sakohata-435097bb/" class="linkedin"><i class="bx bxl-linkedin"></i></a>
               </div>
             </div>
           </div>
@@ -36,8 +35,8 @@
 
           <div class="col-lg-4 col-md-6 footer-newsletter">
             <h4>Our Newsletter</h4>
-            <p>Tamen quem nulla quae legam multos aute sint culpa legam noster magna</p>
-            <form action="" method="post">
+            <p>We are periodically offering up-to-date information of coffee.</p>
+            <form action="forms/contact.php" method="post">
               <input type="email" name="email"><input type="submit" value="Subscribe">
             </form>
 
@@ -56,7 +55,7 @@
         <!-- You can delete the links only if you purchased the pro version. -->
         <!-- Licensing information: https://bootstrapmade.com/license/ -->
         <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/restaurantly-restaurant-template/ -->
-        Designed by <a href="https://bootstrapmade.com/">Hiro</a>
+        Designed by <a href="https://bootstrapmade.com/">BootStrapMade</a>
       </div>
     </div>
   </footer><!-- End Footer -->
@@ -76,6 +75,9 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <!-- change postal code into address automatically -->
+  <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
 
 </body>
 

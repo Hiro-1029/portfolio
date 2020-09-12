@@ -17,7 +17,7 @@ $totalPrice = 0;
           <p class="text-center">Your Cart</p>
         </div>
         
-        <section class='my-3 py-0 text-dark rounded' style="font-family: 'Playfair Display', serif;background:white;">
+        <section class='my-3 py-3 text-dark rounded' style="font-family: 'Playfair Display', serif;background:white;">
           <!-- show message -->
           <?php if (!empty($message)): ?>
             <?= "<p class='pt-4 $color text-center' style='font-size: 20px;'>$message</p>" ?>
@@ -25,13 +25,12 @@ $totalPrice = 0;
 
           <!-- show items in cart -->
           <?php if (empty($rowsToShowCartItems[0])): ?>
-            <div class="text-center" style="font-family:sans-serif;">
+            <div class="text-center my-3" style="font-family:sans-serif;">
               <p class='h5 m-2 p-2'>You cart is empty.</p>
               <p class='h5 m-2 p-2'>Please put some items at Online Shopping Page.</p>
               <div id="login" class="text-center nav-menu my-3">
                 <a href="onlineShopping.php" class="w-25 m-3 mx-auto" style="background:#cda45e;">Go to Our lineup</a>
               </div>
-              <p class='text-center h3 my-2 py-2'></p>
             </div>
           <?php else: ?>
             <div class='container row mx-auto'>
@@ -105,7 +104,7 @@ $totalPrice = 0;
               $beforeTax = $totalPrice + $handling;
               $tax = $beforeTax * 0.072;
               $totalPay = $beforeTax + $tax;
-              ?>
+            ?>
 
             <!-- show total payment -->
             <div class="container mx-auto p-5 border-top" style="font-family:sans-serif;">

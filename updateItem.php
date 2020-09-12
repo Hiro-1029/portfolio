@@ -3,6 +3,8 @@
 require_once('classes/crud.php');
 
 $loginID = $_SESSION['login_id'];
+$itemID = $_SESSION['itemID'];
+
 $now = time();
 if ($now > $_SESSION['expire']) {
   unset($_SESSION['message']);
@@ -74,13 +76,13 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
           <tr>
             <td>Price</td>
             <td>
-              <input type="number" step="0.01" name="itemPrice" value="<?= $resultForItem['item_price'] ?>" class="form-control w-100">
+              <input type="number" step="0.01" min='0' name="itemPrice" value="<?= $resultForItem['item_price'] ?>" class="form-control w-100">
             </td>
           </tr>
           <tr>
             <td>Quantity</td>
             <td>
-              <input type="number" name="itemQuantity" value="<?= $resultForItem['item_quantity'] ?>" class="form-control w-100">
+              <input type="number" name="itemQuantity" min='0' value="<?= $resultForItem['item_quantity'] ?>" class="form-control w-100">
             </td>
           </tr>
           <tr>

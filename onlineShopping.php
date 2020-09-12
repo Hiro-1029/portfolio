@@ -10,6 +10,9 @@ include('parts/header.php');
       <div class="section-title">
         <h2>Lineup</h2>
         <p>Check Our Authentic Coffee</p>
+        <?php 
+          // phpinfo()
+        ?>
       </div>
 
       <?php

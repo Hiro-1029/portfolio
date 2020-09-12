@@ -5,11 +5,14 @@ session_start();
 ini_set('display_errors', '1');
 
 require_once('database.php');
+require_once('functions.php');
+require_once('functionsForInventory.php');
+require_once('functionsForRanking.php');
 
 class CRUD extends Database {
   
   // register user data to table
-  public function register($firstName, $lastName, $bday, $address, $email, $username, $password, $status) {
+  public function register($firstName, $lastName, $bday, $postal, $address, $email, $username, $password, $status) {
     $sqlCheck1 = "SELECT * FROM login WHERE username = '$username' ";
     $sqlCheck2 = "SELECT * FROM login";
     $res1 = $this->conn->query($sqlCheck1);
@@ -17,8 +20,7 @@ class CRUD extends Database {
     $newPassw = password_hash($password, PASSWORD_DEFAULT);
 
     if ($res1->num_rows != 0) {// the case which there is same username in database
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = 'The username already exists. Change your username.';
       $_SESSION['color'] = 'text-danger';
       if ($status == 'A') {
@@ -27,34 +29,31 @@ class CRUD extends Database {
         header('Location: register.php');
       }
     } else {
-      if ($res2->num_rows == 0) {// for initial register
+      if ($res2->num_rows == 0) {// initial register will be Super Admin (a manager or someone)
         $sql1 = "INSERT INTO login(username, password, status) VALUES ('$username', '$newPassw', 'S')";
 
         if ($this->conn->query($sql1)) {
           $lastID = $this->conn->insert_id;
-          $sql2 = "INSERT INTO user(first_name, last_name, bday, address, email, picture, login_id) VALUES ('$firstName', '$lastName', '$bday', '$address', '$email', 'avatar.jpg', '$lastID')";
+          $sql2 = "INSERT INTO user(first_name, last_name, bday, postal, address, email, picture, login_id) VALUES ('$firstName', '$lastName', '$bday', '$postal', '$address', '$email', 'avatar.jpg', '$lastID')";
 
           if ($this->conn->query($sql2)) {
-            $_SESSION['start'] = time();
-            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+            start();
             $_SESSION['message'] = "Your profile registered as Super Admin.";
             $_SESSION['color'] = "text-success";
             header('Location: login.php');
           } else {
-            $_SESSION['start'] = time();
-            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+            start();
             $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
             $_SESSION['color'] = 'text-danger';
             header('Location: register.php');
           }
         } else {
-          $_SESSION['start'] = time();
-          $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+          start();
           $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
           $_SESSION['color'] = 'text-danger';
           header('Location: register.php');
         }
-      } else {// for second register onward
+      } else {// second register onward will be 'A' or 'U', 'A' means 'Admin (employees)' and 'U' means 'User'
         if ($status == 'A') {
           $sql1 = "INSERT INTO login(username, password, status) VALUES ('$username', '$newPassw', '$status')";
         } else {
@@ -64,18 +63,16 @@ class CRUD extends Database {
         if ($this->conn->query($sql1)) {
           $lastID = $this->conn->insert_id;
   
-          $sql2 = "INSERT INTO user(first_name, last_name, bday, address, email, picture, login_id) VALUES ('$firstName', '$lastName', '$bday', '$address', '$email', 'avatar.jpg', '$lastID')";
+          $sql2 = "INSERT INTO user(first_name, last_name, bday, postal, address, email, picture, login_id) VALUES ('$firstName', '$lastName', '$bday', '$postal', '$address', '$email', 'avatar.jpg', '$lastID')";
   
           if ($this->conn->query($sql2)) {
-            $_SESSION['start'] = time();
-            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
-            $_SESSION['message'] = "Your profile registered successfully.";
+            start();
+            $_SESSION['message'] = "Your profile registered.";
             $_SESSION['color'] = "text-success";
             header('Location: login.php');
           } else {
-            $_SESSION['start'] = time();
-            $_SESSION['expire'] = $_SESSION['start'] + 0.1;
-            $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
+            start();
+            $_SESSION['message'] = 'Error in inserting your data.';
             $_SESSION['color'] = 'text-danger';
             if ($status == 'A') {
               header('Location: registerAdmin.php');
@@ -84,9 +81,8 @@ class CRUD extends Database {
             }
           }
         } else {
-          $_SESSION['start'] = time();
-          $_SESSION['expire'] = $_SESSION['start'] + 0.1;
-          $_SESSION['message'] = 'Error in inserting your data. ' . $this->conn->error;
+          start();
+          $_SESSION['message'] = 'Error in inserting your data.';
           $_SESSION['color'] = 'text-danger';
           if ($status == 'A') {
             header('Location: registerAdmin.php');
@@ -98,8 +94,8 @@ class CRUD extends Database {
     }
   }
 
-  // to login
   public function login($username, $password) {
+  // to login
     $sql = "SELECT * FROM login WHERE username = '$username' ";
     $result = $this->conn->query($sql);
 
@@ -118,15 +114,13 @@ class CRUD extends Database {
           header('Location: userProfile.php');
         }
       } else {
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['color'] = "text-danger";
         $_SESSION['message'] = "Error found. Check your username and password.";
         header('Location: login.php');
       }
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['color'] = "text-danger";
       $_SESSION['message'] = "Your username wasn't found.";
       header('Location: login.php');
@@ -191,28 +185,27 @@ class CRUD extends Database {
   }
 
   // update user profile
-  public function updateUser($firstName, $lastName, $address, $email, $loginID, $status) {
-    $sql = "UPDATE user INNER JOIN login ON user.login_id = login.login_id
+  public function updateUser($firstName, $lastName, $postal, $address, $email, $loginID, $status) {
+    $sql = "UPDATE user JOIN login ON user.login_id = login.login_id
       SET
         user.first_name = '$firstName', 
         user.last_name = '$lastName', 
+        user.postal = '$postal', 
         user.address = '$address', 
         user.email = '$email'
       WHERE login.login_id = '$loginID' ";
     
     if ($this->conn->query($sql)) {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['color'] = "text-success";
-      $_SESSION['message'] = "Your profile updated successfully.";
+      $_SESSION['message'] = "Your profile updated.";
       if ($status == 'A') {
         header('Location: updateAdmin.php');
       } else {
         header('Location: userProfile.php');
       }
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = 'Uploading error found.';
       $_SESSION['color'] = 'text-danger';
       if ($status == 'A') {
@@ -261,6 +254,117 @@ class CRUD extends Database {
       return $result->fetch_assoc();
     }
   }
+
+  // get items low in stock
+  public function getItemsLow($stock) {
+    $sql = "SELECT * FROM items WHERE item_quantity <= '$stock' AND item_status != 'S' ORDER BY item_quantity";
+
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
+  // get popular items
+  public function getItemsBest($top) {
+    $sql = "SELECT SUM(calc.calc_quan) AS Sum, items.item_id, items.item_name, items.item_price, items.item_quantity, items.roast_level FROM calc JOIN items ON calc.item_id = items.item_id WHERE calc.calc_status = 'C' GROUP BY items.item_id ORDER BY SUM DESC LIMIT $top ";
+
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
+  // get higher sales items
+  public function getItemsTopSales($top) {
+    $sql = "SELECT SUM(calc.calc_quan) AS Sum, SUM(calc.calc_quan) * items.item_price AS Sales, items.item_id, items.item_name, items.item_price, items.item_quantity, items.roast_level FROM calc JOIN items ON calc.item_id = items.item_id WHERE calc.calc_status = 'C' GROUP BY items.item_id ORDER BY Sales DESC LIMIT $top ";
+
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
+  // get not popular items
+  public function getItemsWorst($worst) {
+    $sql = "SELECT SUM(calc.calc_quan) AS Sum, items.item_id, items.item_name, items.item_price, items.item_quantity, items.roast_level FROM calc JOIN items ON calc.item_id = items.item_id WHERE calc.calc_status = 'C' GROUP BY items.item_id ORDER BY SUM ASC LIMIT $worst ";
+
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
+  // get low sales items
+  public function getItemsWorstSales($worst) {
+    $sql = "SELECT SUM(calc.calc_quan) AS Sum, SUM(calc.calc_quan) * items.item_price AS Sales, items.item_id, items.item_name, items.item_price, items.item_quantity, items.roast_level FROM calc JOIN items ON calc.item_id = items.item_id WHERE calc.calc_status = 'C' GROUP BY items.item_id ORDER BY Sales ASC LIMIT $worst ";
+
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
+  }
+
+  // show items not sold at all
+  public function getItemsNotSold() {
+    // get item IDs which were sold more than once
+    $sqlSold = "SELECT DISTINCT item_id FROM calc WHERE calc_status = 'C' ";
+    $result = $this->conn->query($sqlSold);
+    $rowsSold = [];
+    while ($rowSold = $result->fetch_assoc()) {
+      $rowsSold[] = $rowSold;
+    }
+    $rowsSoldIDs = [];
+    foreach ($rowsSold as $row) {
+      $rowsSoldIDs[] = $row['item_id'];
+    }
+    
+    // get all item IDs
+    $sqlAll = "SELECT item_id FROM items";
+    $result = $this->conn->query($sqlAll);
+    $rowsAll = [];
+    while ($rowAll = $result->fetch_assoc()) {
+      $rowsAll[] = $rowAll;
+    }
+    $rowsAllIDs = [];
+    foreach ($rowsAll as $row) {
+      $rowsAllIDs[] = $row['item_id'];
+    }
+
+    // get item IDs which were not sold even once
+    $rowsNotSoldIDs = array_diff($rowsAllIDs, $rowsSoldIDs);
+
+    // get item infomation which were sold more than once
+    $rowsNotSold = [];
+    foreach ($rowsNotSoldIDs as $row) {
+      $sqlNotSold = "SELECT * FROM items WHERE item_id = '$row' ";
+      if ($result = $this->conn->query($sqlNotSold)) {
+         $rowsNotSold[] = $result->fetch_assoc();
+      }
+    }
+    return $rowsNotSold;
+  }
+
+  // 
+  public function getTotalPayPerMonth($userID, $month) {
+    $sql = "";
+  }
+
 
   // update item information
   public function updateItem($itemID, $itemName, $itemPrice, $itemQuantity, $roast, $itemDesc, $itemPicture, $itemStatus) {
@@ -315,8 +419,7 @@ class CRUD extends Database {
     }
 
     if ($this->conn->query($sql)) {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "Your Password changed. <br> Please don't forget to make a note.";
       $_SESSION['color'] = 'text-success';
       if ($row['status'] == 'A') {
@@ -325,8 +428,7 @@ class CRUD extends Database {
         header('Location: userProfile.php');
       }
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "Your Password hasn't changed.";
       $_SESSION['color'] = 'text-danger';
       if ($row['status'] == 'A') {
@@ -342,14 +444,12 @@ class CRUD extends Database {
     $sql = "UPDATE login SET status = 'R' WHERE login_id = '$userID' ";
       // 'R' -> 'Remove Temporarily'
     if ($this->conn->query($sql)) {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "The selected admin user was removed.";
       $_SESSION['color'] = 'text-success';
       header('Location: showAdminUsers.php');
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "The selected admin user wasn't removed.";
       $_SESSION['color'] = 'text-danger';
       header('Location: showAdminUsers.php');
@@ -361,14 +461,12 @@ class CRUD extends Database {
     $sql = "UPDATE login SET status = 'A' WHERE login_id = '$userID' ";
       // 'R' -> 'Remove Temporarily'
     if ($this->conn->query($sql)) {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "The selected admin user was restored.";
       $_SESSION['color'] = 'text-success';
       header('Location: showAdminUsers.php');
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "The selected admin user wasn't restored.";
       $_SESSION['color'] = 'text-danger';
       header('Location: showAdminUsers.php');
@@ -377,14 +475,13 @@ class CRUD extends Database {
 
   // put item information into calc table at once
   public function insertItem($loginID, $itemID) {
+    // check whether stock is more than 1
     $sqlCheck1 = "SELECT * FROM items WHERE item_id = '$itemID' ";
-      // check whether stock is more than 1
 
     if ($result = $this->conn->query($sqlCheck1)) {
       $row = $result->fetch_assoc();
       if ($row['item_quantity'] = 0) {
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['message'] = $row['item_name'] ." is out of stock now. <br> Sorry for the inconvenience.";
         $_SESSION['color'] = 'text-danger';
         header('Location: cart.php');
@@ -398,8 +495,7 @@ class CRUD extends Database {
     $res = $this->conn->query($sqlCheck2);
 
     if ($res->num_rows > 0) {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = 'This item is already in your cart.';
       $_SESSION['color'] = 'text-danger';
       header('Location: cart.php');
@@ -409,14 +505,12 @@ class CRUD extends Database {
       if ($this->conn->query($sql)) {
         header('Location: cart.php'); 
       } else {
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['message'] = "The item couldn't be added into your cart.";
         $_SESSION['color'] = "text-danger";
         header('Location: cart.php');
       }
     }
-
   }
 
   // show cart information
@@ -439,8 +533,7 @@ class CRUD extends Database {
     if ($this->conn->query($sql)) {
       header('Location: cart.php');
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "Item couldn't be deleted.";
       $_SESSION['color'] = 'text-danger';
       header('Location: cart.php');
@@ -458,21 +551,18 @@ class CRUD extends Database {
         $sql = "UPDATE calc SET calc_quan = '$calcQuan', grind = '$grind' WHERE calc_id = '$calcID' ";
 
         if ($this->conn->query($sql)) {
-          $_SESSION['start'] = time();
-          $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+          start();
           $_SESSION['message'] = "Item information was changed.";
           $_SESSION['color'] = 'text-success';
           header('Location: cart.php');
         } else {
-          $_SESSION['start'] = time();
-          $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+          start();
           $_SESSION['message'] = "Item couldn't be changed.";
           $_SESSION['color'] = 'text-danger';
           header('Location: cart.php');
         }
       } else { // stock isn't enough
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['message'] = 
           "The stock of ". $row['item_name'] ." isn't enough. <br>
           Only ". $row['item_quantity'] ."00g left.<br> 
@@ -510,8 +600,7 @@ class CRUD extends Database {
       return $resultToReturn;
       
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "Error ordering.";
       $_SESSION['color'] = "text-danger";
       header('Location: cart.php');
@@ -557,8 +646,7 @@ class CRUD extends Database {
       }
       
       if ($this->conn->query($sqlUpdate)) {
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['message'] = "You items were ordered. <br> Please look forward to the arrival.";
         $_SESSION['color'] = "text-success";
         header('Location: cart.php');
@@ -576,12 +664,10 @@ class CRUD extends Database {
   }
 
   // show transactions not to have been sent yet
-  public function getTrans($tranStatus) {
-    // if ($tranStatus == 'S') { 
-      if ($tranStatus == 'S' || $tranStatus == 'SN' || $tranStatus == 'SE') { 
+  public function getTrans($tranStatus, $month) {
+    if ($tranStatus == 'S' || $tranStatus == 'SN' || $tranStatus == 'SE') { 
         // 'SN' -> 'Sold out after New', 'SE' -> 'Sold our after Existing'
-        // preg_match('/S/', $tranStatus);
-      $sql = "SELECT * FROM transactions WHERE tran_status = '$tranStatus' ORDER BY tran_id DESC";
+      $sql = "SELECT * FROM transactions WHERE tran_status = '$tranStatus' AND SUBSTRING(shipped_date, 1, 7) = '$month' ORDER BY tran_id DESC";
     } else {
       $sql = "SELECT * FROM transactions WHERE tran_status = '$tranStatus' ";
     }
@@ -593,6 +679,88 @@ class CRUD extends Database {
       $rows[] = $row;
     }
     return $rows;
+  }
+
+  // show selected month's transactions
+  // public function getTransSelectedMonth($month) {
+  // $sql = "SELECT * FROM transactions 
+  //   WHERE (tran_status = 'S' OR tran_status = 'SN' OR tran_status = 'SE') 
+  //     AND SUBSTRING(shipped_date, 1, 7) = '$month' 
+  //   ORDER BY tran_id DESC";
+
+  // $result = $this->conn->query($sql);
+  // $rows = [];
+
+  // while ($row = $result->fetch_assoc()) {
+  //   $rows[] = $row;
+  // }
+  // return $rows;
+  // }
+
+
+  // get months
+  public function getTranMonths($userID, $sort, $count) {
+    if (empty($userID)) {
+      if ($sort == 'A') {
+        $sql = "SELECT shipped_date FROM transactions WHERE tran_status = 'S' ORDER BY shipped_date ASC";
+      } else {
+        $sql = "SELECT shipped_date FROM transactions WHERE tran_status = 'S' ORDER BY shipped_date DESC";
+      }
+    } else {
+      if ($sort == 'A') {
+        $sql = "SELECT shipped_date FROM transactions WHERE tran_status = 'S' AND login_id = '$userID' ORDER BY shipped_date ASC";
+      } else {
+        $sql = "SELECT shipped_date FROM transactions WHERE tran_status = 'S' AND login_id = '$userID' 
+        ORDER BY shipped_date DESC";
+      }
+    } 
+
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+
+    $months = [];
+    foreach ($rows as $row) {
+      $months[] = substr($row['shipped_date'], 0, 7);
+    }
+    
+    if (empty($count)) {
+      $tranMonths = array_unique($months);
+    } else {
+      if (count($months) > $count) {
+        $tranMonths = array_slice(array_unique($months), -$count);
+      } else {
+        $tranMonths = array_unique($months);
+      }
+    }
+
+    return $tranMonths;
+  }
+
+  // get months ranged from monthStart to monthEnd
+  public function getTranMonthsSelected($monthStart, $monthEnd) {
+    $dateStart = date('Y-m-d', strtotime("$monthStart"));
+    $dateEnd = date('Y-m-d', strtotime("$monthEnd + 1 month"));
+
+    $sql = "SELECT shipped_date FROM transactions WHERE tran_status = 'S' AND shipped_date > '$dateStart' AND shipped_date < '$dateEnd' ORDER BY shipped_date ASC";
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+
+    $months = [];
+    foreach ($rows as $row) {
+      $months[] = substr($row['shipped_date'], 0, 7);
+    }
+    
+    $tranMonths = array_unique($months);
+
+    return $tranMonths;
   }
 
   // show transaction details from calc table and items table
@@ -608,7 +776,23 @@ class CRUD extends Database {
       $rows[] = $row;
     }
     return $rows;
+  }
 
+  // get transactions in selected month by userID
+  public function getTransByUser($userID, $status, $month) {
+    if ($status == 'I') {
+      $sql = "SELECT * FROM transactions WHERE login_id = '$userID' AND tran_status = 'I' ";
+    } else {
+      $sql = "SELECT * FROM transactions WHERE login_id = '$userID' AND tran_status = 'S' AND SUBSTRING(shipped_date, 1, 7) = '$month' ORDER BY tran_id DESC";
+    }
+    
+    $result = $this->conn->query($sql);
+    $rows = [];
+
+    while ($row = $result->fetch_assoc()) {
+      $rows[] = $row;
+    }
+    return $rows;
   }
 
   // complete shipment
@@ -626,21 +810,18 @@ class CRUD extends Database {
 
     if ($this->conn->query($sqlForTran)) {
       if ($this->conn->query($sqlForCalc)) {
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['message'] = "This order was shipped.";
         $_SESSION['color'] = "text-success";
         header('Location: showTrans.php');
       } else {
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['message'] = "Error in Calc.";
         $_SESSION['color'] = "text-danger";
         header('Location: showTrans.php');
       }
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "Error in Transactions.";
       $_SESSION['color'] = "text-danger";
       header('Location: showTrans.php');
@@ -705,8 +886,7 @@ class CRUD extends Database {
           if ($this->conn->query($sqlForCal)) {
             $count++;
             if ($count == $countRows) {
-              $_SESSION['start'] = time();
-              $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+              start();
               $_SESSION['message'] = "This order was canceled.";
               $_SESSION['color'] = "text-success";
               header('Location: history.php');
@@ -715,22 +895,107 @@ class CRUD extends Database {
         } // foreach ends here
 
       } else {
-        $_SESSION['start'] = time();
-        $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+        start();
         $_SESSION['message'] = "This order wan't canceled. <br> Please email us.";
         $_SESSION['color'] = "text-danger";
         header('Location: history.php');
       }
     } else {
-      $_SESSION['start'] = time();
-      $_SESSION['expire'] = $_SESSION['start'] + 0.1;
+      start();
       $_SESSION['message'] = "This order wan't canceled. <br> Please email us.";
       $_SESSION['color'] = "text-danger";
       header('Location: history.php');
     }
   }
 
+  // get calc_id(s) by tran_id(s)
+  // public function getCalcID($tranID) {
+  //   $sql = "SELECT * FROM calc JOIN items ON calc.item_id = items.item_id WHERE tran_id = '$tranID' ";
+
+  //   $result = $this->conn->query($sql);
+  //   $rows = [];
+  //   while ($row = $result->fetch_assoc()) {
+  //     $rows[] = $row;
+  //   }
+
+  //   $calcIDs = [];
+  //   foreach ($rows as $row) {
+  //     $calcIDs[] = $row['calc_id'];
+  //   }
+  //   return $calcIDs;
+  // }
+  
+  // check whether there are enough stocks in each item by calc_id(s)
+  public function checkQuanForReorder($calcIDs) {
+    $rowsToCheckQuan = [];
+    $itemNames = [];
+    $count = 0;
+
+    foreach ($calcIDs as $id) {
+      $sql = "SELECT * FROM calc JOIN items on calc.item_id = items.item_id WHERE calc_id = '$id' ";
+
+      if ($result = $this->conn->query($sql)) {
+        $row = $result->fetch_assoc();
+        if ($row['item_quantity'] >= $row['calc_quan']) {
+          $count++;
+        } else {
+          $itemNames[] = $row['item_name'];
+        }
+      }
+    }
+
+    $resultForReorder = [$count, $itemNames];
+    return $resultForReorder;
+  }
+
+  // insert item information to 'calc' table to reorder
+  public function insertItemForReorder($loginID, $calcIDs) {
+    foreach ($calcIDs as $id) {
+      $sqlCheck = "SELECT * FROM calc JOIN items on calc.item_id = items.item_id WHERE calc_id = '$id' ";
+
+      if ($result = $this->conn->query($sqlCheck)) {
+        $row = $result->fetch_assoc();
+        $itemID = $row['item_id'];
+        $calcQuan = $row['calc_quan'];
+        $grind = $row['grind'];
+      } else {
+        start();
+        $_SESSION['message'] = "The item history couldn't be found.";
+        $_SESSION['color'] = "text-danger";
+        header('Location: history.php');
+      }
+      
+      $sql = "INSERT INTO calc(login_id, item_id, calc_quan, grind) VALUES ('$loginID', '$itemID', '$calcQuan', '$grind')";
+  
+      if ($this->conn->query($sql)) {
+        start();
+        $_SESSION['message'] = "The items were added into your cart from your order history.";
+        $_SESSION['color'] = "text-success";
+        header('Location: history.php'); 
+      } else {
+        start();
+        $_SESSION['message'] = "The item couldn't be added into your cart.";
+        $_SESSION['color'] = "text-danger";
+        header('Location: history.php');
+      }
+    }
+  } 
+
+  // get total pay in each month by userID
+  public function getTotalPayByUserID($userID, $month) {
+    if (empty($userID)) {
+      $sql = "SELECT SUM(total_pay) AS Sum  FROM transactions WHERE tran_status = 'S' AND SUBSTRING(shipped_date, 1, 7) = '$month' ";
+    } else {
+      $sql = "SELECT SUM(total_pay) AS Sum  FROM transactions WHERE login_id = '$userID' AND tran_status = 'S' AND SUBSTRING(shipped_date, 1, 7) = '$month' ";
+    }
+
+    if ($result = $this->conn->query($sql)) {
+      return $result->fetch_assoc();
+    }
+  }
 
   
+
+
 
 }

@@ -45,6 +45,12 @@ if ($result['status'] == 'A' || $result['status'] == 'S' || $result['status'] ==
             </td>
           </tr>
           <tr>
+            <td>Postal Code</td>
+            <td class="text-left">
+              <p class="my-1"><?= substr($result['postal'], 0, 3) . "-" . substr($result['postal'], 3) ?></p>
+            </td>
+          </tr>
+          <tr>
             <td>Address</td>
             <td class="text-left">
               <p class="my-1"><?= $result['address'] ?></p>

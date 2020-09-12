@@ -2,7 +2,6 @@
 
 require_once('classes/crud.php');
 
-$loginID = $_SESSION['login_id'];
 $now = time();
 if ($now > $_SESSION['expire']) {
   unset($_SESSION['message']);
@@ -11,6 +10,8 @@ if ($now > $_SESSION['expire']) {
   $message = $_SESSION['message'];
   $color = $_SESSION['color'];
 }
+
+$loginID = $_SESSION['login_id'];
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
@@ -44,20 +45,22 @@ $rows = $user->getAllUsers();
 
   <?php include('parts/navbar.php') ?>
 
-  <main class="my-5">
+  <main class="my-5" style="margin-top:75px !important;">
     <div class="container">
-      <h2 class="text-muted h5">User List</h2>
+      <h2 class="text-muted h3">User List</h2>
 
-      <table class="table table-hover">
-        <thead style="background:#cda45e;">
+      <table class="table table-striped table-hover">
+        <thead style="background:#d2691e;">
           <tr>
             <th>User ID</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Username</th>
             <th>Birthday</th>
+            <th>Postal Code</th>
             <th>Address</th>
             <th>Email</th>
+            <th></th>
           </tr>
         </thead>
 
@@ -69,8 +72,16 @@ $rows = $user->getAllUsers();
               <td><?= $row['last_name']; ?></td>
               <td><?= $row['username']; ?></td>
               <td><?= $row['bday']; ?></td>
+              <td><?= substr($row['postal'], 0, 3) . "-" . substr($row['postal'], 3); ?></td>
               <td><?= $row['address']; ?></td>
               <td><?= $row['email']; ?></td>
+              <td>
+              
+                <form action="showUserDetail.php" method="post">
+                  <input type="hidden" name="userID" value="<?= $row['user_id'] ?>">
+                  <button type="submit" name="detail" class="btn form-control text-white" style="background:#d2691e;">Details</button>
+                </form>
+              </td>
             </tr>
           <?php endforeach ?>
         </tbody>

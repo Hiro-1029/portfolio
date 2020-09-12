@@ -78,6 +78,12 @@ if ($result['status'] != 'A') {
             </td>
           </tr>
           <tr>
+            <td>Postal Code</td>
+            <td>
+              <input type="text" name="postal" value="<?= $result['postal'] ?>" class="form-control w-100">
+            </td>
+          </tr>
+          <tr>
             <td>Address</td>
             <td>
               <input type="text" name="address" value="<?= $result['address'] ?>" class="form-control w-100">

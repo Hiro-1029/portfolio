@@ -2,7 +2,6 @@
 
 session_start();
 
-$loginID = $_SESSION['login_id'];
 $now = time();
 if ($now > $_SESSION['expire']) {
   unset($_SESSION['message']);
@@ -12,8 +11,9 @@ if ($now > $_SESSION['expire']) {
   $color = $_SESSION['color'];
 }
 
+$loginID = $_SESSION['login_id'];
+
 require_once('classes/crud.php');
-require_once('classes/functions.php');
 
 $user = new CRUD;
 $result = $user->getUser($loginID);
@@ -90,7 +90,7 @@ $result = $user->getUser($loginID);
   <div id="topbar" class="d-flex align-items-center fixed-top">
     <div class="container d-flex">
       <div class="contact-info mr-auto">
-        <i class="icofont-phone"></i> +1 5589 55488 55
+        <i class="icofont-phone"></i> +81 90 1234 5678
         <span class="d-none d-lg-inline-block"><i class="icofont-clock-time icofont-rotate-180"></i> Mon-Sat: 9:00 AM - 17:00 PM</span>
       </div>
 

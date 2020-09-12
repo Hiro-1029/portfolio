@@ -44,7 +44,7 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
 
   <?php include('parts/navbar.php') ?>
 
-  <div class="container" data-aos="fade-up">    
+  <div class="container" data-aos="fade-up" style="margin-top:75px !important;">    
     <div class="section-title text-center py-4">
       <p>Register Admin</p>
     </div>

@@ -42,26 +42,26 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
 
   <?php include('parts/navbar.php') ?>
 
-  <div class="card w-50 mx-auto">
-    <div class="card-header" style="background-color:#cda45e;">
-      <p class="text-center h4 my-3 text-dark">Which type of items do you see?</p>
-    </div>
-    <div class="card-body">
-      <form action="" method="post">
-        <select name="item_status" id="" class="form-control w-50 mx-auto">
-          <option value="">Choose</option>
-          <option value="A">All</option>
-          <option value="N">New arrival</option>
-          <option value="E">Existing items</option>
-          <option value="S">Sold out</option>
-        </select>
-        <button type="submit" name="itemType" class="btn btn-block form-control w-50 mt-3 mx-auto text-white" style="background-color:#cda45e;">Search</button>
+  <!-- show items of selected type -->
+  <div class="container mt-5" style="margin-top:75px !important;">
+
+    <div id="type" class="input-group mb-3">
+      <p class="text-muted h5 pr-3 mb-0 align-self-center">Select item type &rarr; </p>
+      <form action="#type" method="post" class="form-inline">
+        <select name="itemStatus" id="inputGroupSelect01" class="form-control form-inline mr-2" style="width:120px;">
+            <option value="">Choose</option>
+            <option value="A">All</option>
+            <option value="N">New arrival</option>
+            <option value="E">Existing items</option>
+            <option value="S">Sold out</option>
+          </select>
+          <button type="submit" name="itemType" class="btn form-control ml-auto text-white" style="background-color:#cda45e; width:100px;">Search</button>
       </form>
     </div>
   </div>
 
   <?php if (isset($_POST['itemType'])) {
-    $status = $_POST['item_status'];
+    $status = $_POST['itemStatus'];
     $rows = $user->getItems($status);
 
     if (empty($rows[0])) {
@@ -69,7 +69,7 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
     } else {
       echo "<h2 class='text-dark text-center mt-5'>Item List</h2>";
 
-      echo "<main class='my-5 text-dark'>";
+      echo "<section class='my-5 text-dark pt-0'>";
 
         echo "<div class='container row mx-auto'>";
           foreach ($rows as $row) {
@@ -119,10 +119,12 @@ if ($result['status'] == 'U' || $result['status'] == 'R' ||empty($loginID)) {
           }
         echo "</div>";
 
-      echo "</main>";
+      echo "</section>";
     }
   }
   ?>
+
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
